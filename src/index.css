@@ -6,3 +6,10 @@ body {
     background: #202020;
     color: #fff;
 }
+
+.floating-input {
+    position: relative;
+    z-index: 1;
+    padding-top: 20px;
+    /* Espacio para la etiqueta flotante */
+}
