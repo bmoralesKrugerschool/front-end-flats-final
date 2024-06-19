@@ -131,7 +131,7 @@ function RegisterPage() {
             {errors.birthdate && <p className="text-red-500 mt-1">{errors.birthdate.message}</p>}
           </div>
 
-          <button type="submit" className="w-full bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200">Crear tu Cuenta</button>
+          <button type="submit" className="w-full bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200">Create your user</button>
         </form>
       </div>
     </div>
