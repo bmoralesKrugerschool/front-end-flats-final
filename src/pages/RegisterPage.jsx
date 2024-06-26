@@ -1,24 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaUser, FaEnvelope, FaLock, FaBirthdayCake } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { register as registerUser } from '../servers/auth'; // Cambié el nombre para evitar conflictos con el `register` de `react-hook-form`
 
 function RegisterPage() {
-  const { register, handleSubmit, formState: { errors }, clearErrors } = useForm();
+  const { register, handleSubmit, formState: { errors }, clearErrors, setError } = useForm();
   const [errorTimeouts, setErrorTimeouts] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [backendMessage, setBackendMessage] = useState('');
 
-  const onSubmit = data => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      // Convertir la fecha de birthDate a YYYY/MM/DD
+      const formattedBirthdate = data.birthDate.replace(/-/g, '/');
+      const modifiedData = { ...data, birthDate: formattedBirthdate };
+
+      const response = await registerUser(modifiedData);
+      console.log(response);
+      setBackendMessage('User registered successfully!');
+    } catch (error) {
+      console.error('Error registering user:', error);
+      setBackendMessage(error.message);
+    }
   };
 
   const validateAge = (value) => {
     const today = new Date();
     const birthDate = new Date(value);
-    const age = today.getFullYear() - birthDate.getFullYear();
+    let age = today.getFullYear() - birthDate.getFullYear();
     const monthDifference = today.getMonth() - birthDate.getMonth();
 
     if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-      return age - 1 >= 18;
+      age--;
     }
+
     return age >= 18;
   };
 
@@ -105,30 +120,62 @@ function RegisterPage() {
               <FaLock className="absolute left-3 top-3 text-[#B9B4C7]" />
               <input
                 id="password"
-                type="password"
-                {...register('password', { required: 'Password is required' })}
+                type={showPassword ? 'text' : 'password'}
+                {...register('password', {
+                  required: 'Password is required',
+                  minLength: {
+                    value: 8,
+                    message: 'Password must be at least 8 characters long'
+                  }
+                  
+                  
+                })}
                 placeholder="Password"
                 className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.password ? 'border border-red-500' : ''}`}
               />
+              <button
+                type="button"
+                className="absolute right-3 top-3 text-[#B9B4C7]"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
             {errors.password && <p className="text-red-500 mt-1">{errors.password.message}</p>}
           </div>
 
           <div className="mb-4">
-            <label htmlFor="birthdate" className="block text-[#B9B4C7] mb-2">Birthdate</label>
+            <label htmlFor="birthDate" className="block text-[#B9B4C7] mb-2">Birthdate</label>
             <div className="relative">
               <FaBirthdayCake className="absolute left-3 top-3 text-[#B9B4C7]" />
               <input
-                id="birthdate"
+                id="birthDate"
                 type="date"
-                {...register('birthdate', {
+                {...register('birthDate', {
                   required: 'Birthdate is required',
                   validate: value => validateAge(value) || 'You must be at least 18 years old'
                 })}
-                className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.birthdate ? 'border border-red-500' : ''}`}
+                className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.birthDate ? 'border border-red-500' : ''}`}
               />
             </div>
-            {errors.birthdate && <p className="text-red-500 mt-1">{errors.birthdate.message}</p>}
+            {errors.birthDate && <p className="text-red-500 mt-1">{errors.birthDate.message}</p>}
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="role" className="block text-[#B9B4C7] mb-2">Role</label>
+            <div className="relative">
+              <FaUser className="absolute left-3 top-3 text-[#B9B4C7]" />
+              <select
+                id="role"
+                {...register('role', { required: 'Role is required' })}
+                className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.role ? 'border border-red-500' : ''}`}
+              >
+                <option value="">Select Role</option>
+                <option value="landlord">Landlord</option>
+                <option value="renter">Renter</option>
+              </select>
+            </div>
+            {errors.role && <p className="text-red-500 mt-1">{errors.role.message}</p>}
           </div>
 
           <button type="submit" className="w-full bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200">Create your user</button>
