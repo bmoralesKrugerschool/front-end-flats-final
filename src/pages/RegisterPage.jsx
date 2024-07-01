@@ -17,7 +17,7 @@ function RegisterPage() {
 
       const response = await registerUser(modifiedData);
       console.log(response);
-      setBackendMessage('User registered successfully!');
+      setBackendMessage(response.message);
     } catch (error) {
       console.error('Error registering user:', error);
       setBackendMessage(error.message);
@@ -181,6 +181,7 @@ function RegisterPage() {
           <button type="submit" className="w-full bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200">Create your user</button>
         </form>
       </div>
+      {backendMessage && <p className="text-red-500 mt-4">{backendMessage}</p>}
     </div>
   );
 }
