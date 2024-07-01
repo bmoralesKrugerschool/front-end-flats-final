@@ -2,12 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { register as registerUser } from '../servers/auth'; // Cambié el nombre para evitar conflictos con el `register` de `react-hook-form`
+import { useNavigate } from 'react-router-dom';
 
 function RegisterPage() {
   const { register, handleSubmit, formState: { errors }, clearErrors, setError } = useForm();
   const [errorTimeouts, setErrorTimeouts] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => { 
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/profile');
+    }
+  }, [navigate]);
 
   const onSubmit = async (data) => {
     try {
@@ -18,6 +27,9 @@ function RegisterPage() {
       const response = await registerUser(modifiedData);
       console.log(response);
       setBackendMessage(response.message);
+      if (response.data && response.data.token) {
+        navigate('/profile'); // Redirigir a la pantalla de perfil si el registro es exitoso
+      }
     } catch (error) {
       console.error('Error registering user:', error);
       setBackendMessage(error.message);
@@ -127,8 +139,6 @@ function RegisterPage() {
                     value: 8,
                     message: 'Password must be at least 8 characters long'
                   }
-                  
-                  
                 })}
                 placeholder="Password"
                 className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.password ? 'border border-red-500' : ''}`}
@@ -180,8 +190,8 @@ function RegisterPage() {
 
           <button type="submit" className="w-full bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200">Create your user</button>
         </form>
+        {backendMessage && <p className="text-red-500 mt-4">{backendMessage}</p>}
       </div>
-      {backendMessage && <p className="text-red-500 mt-4">{backendMessage}</p>}
     </div>
   );
 }
