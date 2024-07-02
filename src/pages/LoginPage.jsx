@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { login as loginUser } from '../servers/auth'; // Importa tu función de inicio de sesión
 import { useNavigate } from 'react-router-dom';
-import AuthContext from '../contexts/AuthContext';
+import AuthContext from '../context/AuthContext';
 
 
 

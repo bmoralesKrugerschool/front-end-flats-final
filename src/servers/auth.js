@@ -21,3 +21,13 @@ export const login = async (data) => {
     return error.response.data;
   }
 }
+
+export const logout = async (data) => {
+  data.status = true
+  try {
+    const response = await axios.post(`${Api}logout`, data);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
