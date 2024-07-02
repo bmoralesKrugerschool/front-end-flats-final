@@ -28,7 +28,7 @@ function RegisterPage() {
       console.log(response);
       setBackendMessage(response.message);
       if (response.data && response.data.token) {
-        navigate('/profile'); // Redirigir a la pantalla de perfil si el registro es exitoso
+        navigate('/flats'); // Redirigir a la pantalla de perfil si el registro es exitoso
       }
     } catch (error) {
       console.error('Error registering user:', error);
