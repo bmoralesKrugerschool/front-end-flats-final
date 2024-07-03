@@ -17,7 +17,7 @@ function LoginPage() {
       console.log(response);
 
       if (response.code === 200) {
-        navigate('/profile');
+        navigate('/flats');
         setBackendMessage(response.message);
         localStorage.setItem('token', response.token);
       } else {
