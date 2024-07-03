@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { login as loginUser } from '../servers/auth'; // Importa tu función de inicio de sesión
+import { login as loginUser } from '../servers/auth';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
-
-
 
 function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -19,9 +17,9 @@ function LoginPage() {
       console.log(response);
 
       if (response.code === 200) {
-        navigate('/profile'); // Redirige al perfil si el inicio de sesión es exitoso
+        navigate('/profile');
         setBackendMessage(response.message);
-        localStorage.setItem('token', result.token);
+        localStorage.setItem('token', response.token);
       } else {
         console.log('ingreso', response);
         setBackendMessage(response.message);
@@ -29,7 +27,11 @@ function LoginPage() {
     } catch (error) {
       console.error('Error logging in:', error);
       setBackendMessage('An error occurred during login. Please try again.');
-    } 
+    }
+  };
+
+  const goToRegister = () => {
+    navigate('/register');
   };
 
   return (
@@ -83,8 +85,17 @@ function LoginPage() {
 
           <button type="submit" className="w-full bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200">Login</button>
         </form>
+        
+        <button
+          type="button"
+          className="w-full mt-4 bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200"
+          onClick={goToRegister}
+        >
+          Register
+        </button>
         {backendMessage && <p className="text-red-500 mt-4">{backendMessage}</p>}
       </div>
+      
     </div>
   );
 }

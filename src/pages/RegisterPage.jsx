@@ -4,6 +4,7 @@ import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'r
 import { register as registerUser } from '../servers/auth'; // Cambié el nombre para evitar conflictos con el `register` de `react-hook-form`
 import { useNavigate } from 'react-router-dom';
 
+
 function RegisterPage() {
   const { register, handleSubmit, formState: { errors }, clearErrors, setError } = useForm();
   const [errorTimeouts, setErrorTimeouts] = useState({});
@@ -11,12 +12,7 @@ function RegisterPage() {
   const [backendMessage, setBackendMessage] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => { 
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/profile');
-    }
-  }, [navigate]);
+  
 
   const onSubmit = async (data) => {
     try {
@@ -72,6 +68,9 @@ function RegisterPage() {
       Object.values(errorTimeouts).forEach(clearTimeout);
     };
   }, [errors, clearErrors, errorTimeouts]);
+  const goToLogin = () => {
+    navigate('/');
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#352F44] p-4">
@@ -190,6 +189,14 @@ function RegisterPage() {
 
           <button type="submit" className="w-full bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200">Create your user</button>
         </form>
+        
+        <button
+          type="button"
+          className="w-full mt-4 bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200"
+          onClick={goToLogin}
+        >
+          Login
+        </button>
         {backendMessage && <p className="text-red-500 mt-4">{backendMessage}</p>}
       </div>
     </div>
