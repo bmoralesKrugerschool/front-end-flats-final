@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Flats from './pages/FlatsPages';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
           <Route path="/flats/:id" element={<h1>Flat Details</h1>} />
           <Route path="/flats/:id/edit" element={<h1>Edit Flat</h1>} />
           <Route path="/flats/new" element={<h1>New Flat</h1>} />
-          <Route path="*" element={<h1>NotFound</h1>} />
+          <Route path="*" element={<NotFoundPage/>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
