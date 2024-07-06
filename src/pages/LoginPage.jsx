@@ -4,7 +4,7 @@ import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button, TextField, Typography, Container, Grid, IconButton, Link } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import ThemeSwitcher from '../components/ThemeSwitcher';
 
 const LoginPage = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -12,19 +12,28 @@ const LoginPage = () => {
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const [backendMessage, setBackendMessage] = useState('');
-  const [themeMode, setThemeMode] = useState('auto'); 
+  const [randomImage, setRandomImage] = useState(null);
 
-  const toggleThemeMode = () => {
-    const newMode = themeMode === 'light' ? 'dark' : themeMode === 'dark' ? 'auto' : 'light';
-    setThemeMode(newMode);
-    localStorage.setItem('theme', newMode);
-    document.documentElement.classList.toggle('dark', newMode === 'dark');
+  // API UNSPLASH
+  const fetchRandomImage = async () => {
+    try {
+      const response = await fetch('https://api.unsplash.com/photos/random?query=house,apartment&client_id=2eICAWSF-EYZL2BumHCsX9C9DFsug-npLoFPQw01_Ok');
+      if (!response.ok) {
+        throw new Error('Failed to fetch image');
+      }
+      const data = await response.json();
+      const image = {
+        url: data.urls.regular,
+        alt: data.alt_description
+      };
+      setRandomImage(image);
+    } catch (error) {
+      console.error('Error fetching random image:', error);
+    }
   };
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') || (window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light');
-    setThemeMode(storedTheme);
-    document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+    fetchRandomImage();
   }, []);
 
   const onSubmit = async (data) => {
@@ -51,94 +60,88 @@ const LoginPage = () => {
     navigate('/register');
   };
 
-  const theme = createTheme({
-    palette: {
-      mode: themeMode === 'dark' ? 'dark' : 'light',
-    },
-  });
-
   return (
-    <ThemeProvider theme={theme}>
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 font-sans">
-        <Container maxWidth="sm">
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item xs={12}>
-              <Typography variant="h3" align="center" color="textPrimary" gutterBottom>
-                LOGIN
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      id="email"
-                      {...register('email', {
-                        required: 'Email is required',
-                        pattern: {
-                          value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                          message: 'Invalid email address'
-                        }
-                      })}
-                      label="Email"
-                      fullWidth
-                      variant="filled"
-                      error={!!errors.email}
-                      helperText={errors.email && errors.email.message}
-                      InputProps={{
-                        startAdornment: <FaEnvelope className="text-gray-400" />,
-                      }}
-                    />
+    <ThemeSwitcher>
+      <div className="flex items-center justify-center min-h-screen">
+        <Container maxWidth="lg">
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <div>
+                <Typography variant="h3" align="center" gutterBottom>
+                  LOGIN
+                </Typography>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        id="email"
+                        {...register('email', {
+                          required: 'Email is required',
+                          pattern: {
+                            value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                            message: 'Invalid email address'
+                          }
+                        })}
+                        label="Email"
+                        fullWidth
+                        variant="filled"
+                        error={!!errors.email}
+                        helperText={errors.email && errors.email.message}
+                        InputProps={{
+                          startAdornment: <FaEnvelope />,
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        {...register('password', {
+                          required: 'Password is required',
+                        })}
+                        label="Password"
+                        fullWidth
+                        variant="filled"
+                        error={!!errors.password}
+                        helperText={errors.password && errors.password.message}
+                        InputProps={{
+                          startAdornment: <FaLock />,
+                          endAdornment: (
+                            <IconButton onClick={togglePasswordVisibility}>
+                              {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </IconButton>
+                          )
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Button type="submit" fullWidth variant="contained" color="primary">
+                        Login
+                      </Button>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      {...register('password', {
-                        required: 'Password is required',
-                      })}
-                      label="Password"
-                      fullWidth
-                      variant="filled"
-                      error={!!errors.password}
-                      helperText={errors.password && errors.password.message}
-                      InputProps={{
-                        startAdornment: <FaLock className="text-gray-400" />,
-                        endAdornment: (
-                          <IconButton onClick={togglePasswordVisibility}>
-                            {showPassword ? <FaEyeSlash className="text-gray-400" /> : <FaEye className="text-gray-400" />}
-                          </IconButton>
-                        )
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button type="submit" fullWidth variant="contained" color="primary">
-                      Login
-                    </Button>
-                  </Grid>
-                </Grid>
-              </form>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body2" color="textSecondary" align="center">
-                <Link component="button" variant="body2" onClick={goToRegister}>
-                  Don't have an account? Register!
-                </Link>
-              </Typography>
-              {backendMessage && <Typography variant="body2" color="error">{backendMessage}</Typography>}
-            </Grid>
-            <Grid item xs={12}>
-              <div className="flex justify-center">
-                <Button variant="text" onClick={toggleThemeMode}>
-                  {themeMode === 'light' ? 'Switch to Dark Mode' : themeMode === 'dark' ? 'Switch to Light Mode' : 'Switch to Auto Mode'}
-                </Button>
+                </form>
+                <Typography variant="body2" align="center">
+                  <Link component="button" variant="body2" onClick={goToRegister}>
+                    Don't have an account? Register!
+                  </Link>
+                </Typography>
+                {backendMessage && <Typography variant="body2" color="error">{backendMessage}</Typography>}
               </div>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              {randomImage && (
+                <div className="flex justify-center items-center h-full">
+                  <div className="p-2">
+                    <img src={randomImage.url} alt={randomImage.alt} className="max-w-full max-h-full" />
+                  </div>
+                </div>
+              )}
             </Grid>
           </Grid>
         </Container>
       </div>
-    </ThemeProvider>
+    </ThemeSwitcher>
   );
 }
 
