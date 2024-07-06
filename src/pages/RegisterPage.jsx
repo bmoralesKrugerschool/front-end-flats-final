@@ -1,35 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash, FaAdjust } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import  {useAuth}  from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+import { Button, TextField, Typography, Container, Grid, IconButton } from '@mui/material';
 
-function RegisterPage() {
+const RegisterPage = () => {
   const { register, handleSubmit, formState: { errors }, clearErrors, setError } = useForm();
-
-  const [errorTimeouts, setErrorTimeouts] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
-  const  {signUp, user } = useAuth();
+  const { signUp } = useAuth();
   const navigate = useNavigate();
+  const [themeMode, setThemeMode] = useState('auto');
 
-  console.log('errors:', errors);
-  console.log('backendMessage:', backendMessage);
-  console.log('showPassword state:',  showPassword);
-  console.log('register:', register);
-  console.log('handleSubmit:', handleSubmit);
-  console.log('signUp:', signUp);
-  console.log('navigate:', navigate);
-  console.log('user:', user);
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = storedTheme || (prefersDarkMode ? 'dark' : 'light');
+
+    setThemeMode(initialTheme);
+    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+  }, []);
+
+  const toggleThemeMode = () => {
+    const newThemeMode = themeMode === 'light' ? 'dark' : themeMode === 'dark' ? 'auto' : 'light';
+    setThemeMode(newThemeMode);
+    document.documentElement.classList.toggle('dark', newThemeMode === 'dark');
+    localStorage.setItem('theme', newThemeMode);
+  };
 
   const onSubmit = async (data) => {
-    console.log('data:', data);
     try {
       const formattedBirthdate = data.birthDate.replace(/-/g, '/');
       const modifiedData = { ...data, birthDate: formattedBirthdate };
 
       const response = await signUp(modifiedData);
-      console.log(response);
       setBackendMessage(response.message);
       if (response.data && response.data.token) {
         navigate('/flats');
@@ -53,161 +58,169 @@ function RegisterPage() {
     return age >= 18;
   };
 
-  useEffect(() => {
-    Object.keys(errors).forEach((field) => {
-      if (!errorTimeouts[field]) {
-        const timeout = setTimeout(() => {
-          clearErrors(field);
-          setErrorTimeouts((prevTimeouts) => {
-            const updatedTimeouts = { ...prevTimeouts };
-            delete updatedTimeouts[field];
-            return updatedTimeouts;
-          });
-        }, 5000);
-
-        setErrorTimeouts((prevTimeouts) => ({
-          ...prevTimeouts,
-          [field]: timeout,
-        }));
-      }
-    });
-
-    return () => {
-      Object.values(errorTimeouts).forEach(clearTimeout);
-    };
-  }, [errors, clearErrors, errorTimeouts]);
-  
   const goToLogin = () => {
     navigate('/');
   };
 
+  const themeButtonText = {
+    light: 'Switch to Dark Mode',
+    dark: 'Switch to Light Mode',
+    auto: 'Switch to Auto Mode'
+  }[themeMode];
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#352F44] p-4">
-      <div className="bg-[#5C5470] w-full max-w-md p-10 rounded-md shadow-md">
-        <h2 className="text-2xl text-center text-[#FAF0E6] mb-4">REGISTER</h2>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-[#B9B4C7] mb-2">First Name</label>
-            <div className="relative">
-              <FaUser className="absolute left-3 top-3 text-[#B9B4C7]" />
-              <input
-                id="name"
-                {...register('name', { required: 'First name is required' })}
-                placeholder="First Name"
-                className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.name ? 'border border-red-500' : ''}`}
-              />
-            </div>
-            {errors.name && <p className="text-red-500 mt-1">{errors.name.message}</p>}
+    <div className="flex items-center justify-center min-h-screen bg-gray-900 font-sans">
+      <Container maxWidth="sm">
+        <div className="bg-gray-800 w-full max-w-md p-10 rounded-md shadow-md">
+          <Typography variant="h4" align="center" color="textPrimary" gutterBottom>
+            REGISTER
+          </Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  id="name"
+                  {...register('name', { required: 'First name is required' })}
+                  label="First Name"
+                  fullWidth
+                  variant="filled"
+                  className={`mb-4 ${errors.name ? 'border border-red-500' : ''}`}
+                  InputProps={{
+                    startAdornment: <FaUser className="text-gray-400" />
+                  }}
+                  error={!!errors.name}
+                  helperText={errors.name && errors.name.message}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="lastName"
+                  {...register('lastName', { required: 'Last name is required' })}
+                  label="Last Name"
+                  fullWidth
+                  variant="filled"
+                  className={`mb-4 ${errors.lastName ? 'border border-red-500' : ''}`}
+                  InputProps={{
+                    startAdornment: <FaUser className="text-gray-400" />
+                  }}
+                  error={!!errors.lastName}
+                  helperText={errors.lastName && errors.lastName.message}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="email"
+                  {...register('email', {
+                    required: 'Email is required',
+                    pattern: {
+                      value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                      message: 'Invalid email address'
+                    }
+                  })}
+                  label="Email"
+                  fullWidth
+                  variant="filled"
+                  className={`mb-4 ${errors.email ? 'border border-red-500' : ''}`}
+                  InputProps={{
+                    startAdornment: <FaEnvelope className="text-gray-400" />
+                  }}
+                  error={!!errors.email}
+                  helperText={errors.email && errors.email.message}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password', {
+                    required: 'Password is required',
+                    minLength: {
+                      value: 8,
+                      message: 'Password must be at least 8 characters long'
+                    }
+                  })}
+                  label="Password"
+                  fullWidth
+                  variant="filled"
+                  className={`mb-4 ${errors.password ? 'border border-red-500' : ''}`}
+                  InputProps={{
+                    startAdornment: <FaLock className="text-gray-400" />,
+                    endAdornment: (
+                      <IconButton onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <FaEyeSlash className="text-gray-400" /> : <FaEye className="text-gray-400" />}
+                      </IconButton>
+                    )
+                  }}
+                  error={!!errors.password}
+                  helperText={errors.password && errors.password.message}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="birthDate"
+                  type="date"
+                  {...register('birthDate', {
+                    required: 'Birthdate is required',
+                    validate: value => validateAge(value) || 'You must be at least 18 years old'
+                  })}
+                  label="Birthdate"
+                  fullWidth
+                  variant="filled"
+                  className={`mb-4 ${errors.birthDate ? 'border border-red-500' : ''}`}
+                  InputProps={{
+                    startAdornment: <FaBirthdayCake className="text-gray-400" />
+                  }}
+                  error={!!errors.birthDate}
+                  helperText={errors.birthDate && errors.birthDate.message}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  id="role"
+                  select
+                  {...register('role', { required: 'Role is required' })}
+                  label="Role"
+                  fullWidth
+                  variant="filled"
+                  className={`mb-4 ${errors.role ? 'border border-red-500' : ''}`}
+                  InputProps={{
+                    startAdornment: <FaUser className="text-gray-400" />
+                  }}
+                  error={!!errors.role}
+                  helperText={errors.role && errors.role.message}
+                >
+                  <option value="">Select Role</option>
+                  <option value="landlord">Landlord</option>
+                  <option value="renter">Renter</option>
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <Button type="submit" fullWidth variant="contained" color="primary">
+                  Create your user
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+          
+          <Button
+            type="button"
+            fullWidth
+            variant="outlined"
+            onClick={goToLogin}
+            className="mb-4"
+          >
+            Login
+          </Button>
+          
+          <div className="flex justify-center">
+            <Button variant="text" onClick={toggleThemeMode} startIcon={<FaAdjust className="mr-2" />}>
+              {themeButtonText}
+            </Button>
           </div>
-
-          <div className="mb-4">
-            <label htmlFor="lastName" className="block text-[#B9B4C7] mb-2">Last Name</label>
-            <div className="relative">
-              <FaUser className="absolute left-3 top-3 text-[#B9B4C7]" />
-              <input
-                id="lastName"
-                {...register('lastName', { required: 'Last name is required' })}
-                placeholder="Last Name"
-                className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.lastName ? 'border border-red-500' : ''}`}
-              />
-            </div>
-            {errors.lastName && <p className="text-red-500 mt-1">{errors.lastName.message}</p>}
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-[#B9B4C7] mb-2">Email</label>
-            <div className="relative">
-              <FaEnvelope className="absolute left-3 top-3 text-[#B9B4C7]" />
-              <input
-                id="email"
-                {...register('email', {
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                    message: 'Invalid email address'
-                  }
-                })}
-                placeholder="Email"
-                className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.email ? 'border border-red-500' : ''}`}
-              />
-            </div>
-            {errors.email && <p className="text-red-500 mt-1">{errors.email.message}</p>}
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-[#B9B4C7] mb-2">Password</label>
-            <div className="relative">
-              <FaLock className="absolute left-3 top-3 text-[#B9B4C7]" />
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: {
-                    value: 8,
-                    message: 'Password must be at least 8 characters long'
-                  }
-                })}
-                placeholder="Password"
-                className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.password ? 'border border-red-500' : ''}`}
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-3 text-[#B9B4C7]"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-            {errors.password && <p className="text-red-500 mt-1">{errors.password.message}</p>}
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="birthDate" className="block text-[#B9B4C7] mb-2">Birthdate</label>
-            <div className="relative">
-              <FaBirthdayCake className="absolute left-3 top-3 text-[#B9B4C7]" />
-              <input
-                id="birthDate"
-                type="date"
-                {...register('birthDate', {
-                  required: 'Birthdate is required',
-                  validate: value => validateAge(value) || 'You must be at least 18 years old'
-                })}
-                className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.birthDate ? 'border border-red-500' : ''}`}
-              />
-            </div>
-            {errors.birthDate && <p className="text-red-500 mt-1">{errors.birthDate.message}</p>}
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="role" className="block text-[#B9B4C7] mb-2">Role</label>
-            <div className="relative">
-              <FaUser className="absolute left-3 top-3 text-[#B9B4C7]" />
-              <select
-                id="role"
-                {...register('role', { required: 'Role is required' })}
-                className={`w-full bg-[#9B4C7] text-[#B9B4C7] px-10 py-2 rounded-md ${errors.role ? 'border border-red-500' : ''}`}
-              >
-                <option value="">Select Role</option>
-                <option value="landlord">Landlord</option>
-                <option value="renter">Renter</option>
-              </select>
-            </div>
-            {errors.role && <p className="text-red-500 mt-1">{errors.role.message}</p>}
-          </div>
-
-          <button type="submit" className="w-full bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200">Create your user</button>
-        </form>
-        
-        <button
-          type="button"
-          className="w-full mt-4 bg-[#B9B4C7] text-[#413c4e] px-4 py-2 rounded-md hover:bg-[#413c4e] hover:text-[#FAF0E6] transition-colors duration-200"
-          onClick={goToLogin}
-        >
-          Login
-        </button>
-        {backendMessage && <p className="text-red-500 mt-4">{backendMessage}</p>}
-      </div>
+          
+          {backendMessage && <Typography variant="body2" color="error" className="mt-4">{backendMessage}</Typography>}
+        </div>
+      </Container>
     </div>
   );
 }
