@@ -1,30 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { register as registerUser } from '../servers/auth'; // Cambié el nombre para evitar conflictos con el `register` de `react-hook-form`
 import { useNavigate } from 'react-router-dom';
-
+import  {useAuth}  from '../context/AuthContext';
 
 function RegisterPage() {
   const { register, handleSubmit, formState: { errors }, clearErrors, setError } = useForm();
+
   const [errorTimeouts, setErrorTimeouts] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
+  const  {signUp, user } = useAuth();
   const navigate = useNavigate();
 
-  
+  console.log('errors:', errors);
+  console.log('backendMessage:', backendMessage);
+  console.log('showPassword state:',  showPassword);
+  console.log('register:', register);
+  console.log('handleSubmit:', handleSubmit);
+  console.log('signUp:', signUp);
+  console.log('navigate:', navigate);
+  console.log('user:', user);
 
   const onSubmit = async (data) => {
+    console.log('data:', data);
     try {
-      // Convertir la fecha de birthDate a YYYY/MM/DD
       const formattedBirthdate = data.birthDate.replace(/-/g, '/');
       const modifiedData = { ...data, birthDate: formattedBirthdate };
 
-      const response = await registerUser(modifiedData);
+      const response = await signUp(modifiedData);
       console.log(response);
       setBackendMessage(response.message);
       if (response.data && response.data.token) {
-        navigate('/flats'); // Redirigir a la pantalla de perfil si el registro es exitoso
+        navigate('/flats');
       }
     } catch (error) {
       console.error('Error registering user:', error);
@@ -68,6 +76,7 @@ function RegisterPage() {
       Object.values(errorTimeouts).forEach(clearTimeout);
     };
   }, [errors, clearErrors, errorTimeouts]);
+  
   const goToLogin = () => {
     navigate('/');
   };

@@ -1,19 +1,29 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { login as loginUser } from '../servers/auth';
 import { useNavigate } from 'react-router-dom';
-import AuthContext from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
+  console.log('errors:', errors);
+  console.log('backendMessage:', backendMessage);
+  console.log('showPassword state:', showPassword);
+  console.log('register:', register);
+  console.log('handleSubmit:', handleSubmit);
+  console.log('signIn:', signIn);
+  console.log('navigate:', navigate);
+
+
   const onSubmit = async (data) => {
+    console.log('data:', data);
     try {
-      const response = await loginUser(data);
+      const response = await signIn(data);
       console.log(response);
 
       if (response.code === 200) {
@@ -21,7 +31,6 @@ function LoginPage() {
         setBackendMessage(response.message);
         localStorage.setItem('token', response.token);
       } else {
-        console.log('ingreso', response);
         setBackendMessage(response.message);
       }
     } catch (error) {
@@ -33,7 +42,6 @@ function LoginPage() {
   const goToRegister = () => {
     navigate('/register');
   };
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#352F44] p-4">
       <div className="bg-[#5C5470] w-full max-w-md p-10 rounded-md shadow-md">
