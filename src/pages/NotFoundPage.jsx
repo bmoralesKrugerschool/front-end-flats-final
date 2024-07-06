@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Typography, Button } from '@mui/material';
+import errorImage from '../../src/images/404-error.svg';
+
 
 const NotFoundPage = () => {
   return (
@@ -8,7 +10,7 @@ const NotFoundPage = () => {
       <Container maxWidth="md" className="py-12">
         <div className="flex flex-col items-center justify-center text-center text-white">
           <img
-            src="/images/404-error.svg"
+            src={errorImage}
             alt="404 Error"
             className="w-64 h-64 mb-8"
           />
@@ -34,3 +36,4 @@ const NotFoundPage = () => {
 }
 
 export default NotFoundPage;
+
