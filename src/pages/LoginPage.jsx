@@ -14,7 +14,6 @@ const LoginPage = () => {
   const [backendMessage, setBackendMessage] = useState('');
   const [randomImage, setRandomImage] = useState(null);
 
-  // API UNSPLASH
   const fetchRandomImage = async () => {
     try {
       const response = await fetch('https://api.unsplash.com/photos/random?query=house,apartment&client_id=2eICAWSF-EYZL2BumHCsX9C9DFsug-npLoFPQw01_Ok');
@@ -62,12 +61,23 @@ const LoginPage = () => {
 
   return (
     <ThemeSwitcher>
-      <div className="flex items-center justify-center min-h-screen">
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        backgroundColor: 'background.default',
+      }}>
         <Container maxWidth="lg">
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <div>
-                <Typography variant="h3" align="center" gutterBottom>
+              <div style={{
+                backgroundColor: 'background.paper',
+                padding: '2rem',
+                borderRadius: '0.5rem',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+              }}>
+                <Typography variant="h3" align="center" gutterBottom style={{ color: 'text.primary' }}>
                   LOGIN
                 </Typography>
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -90,6 +100,7 @@ const LoginPage = () => {
                         InputProps={{
                           startAdornment: <FaEnvelope />,
                         }}
+                        style={{ backgroundColor: '#fff' }}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -112,29 +123,31 @@ const LoginPage = () => {
                             </IconButton>
                           )
                         }}
+                        style={{ backgroundColor: '#fff' }}
                       />
                     </Grid>
                     <Grid item xs={12}>
-                      <Button type="submit" fullWidth variant="contained" color="primary">
+                      <Button type="submit" fullWidth variant="contained" color="primary" style={{ backgroundColor: 'primary.main', color: 'secondary.main' }}>
                         Login
                       </Button>
                     </Grid>
                   </Grid>
                 </form>
-                <Typography variant="body2" align="center">
-                  <Link component="button" variant="body2" onClick={goToRegister}>
-                    Don't have an account? Register!
+                <Typography variant="body2" align="center" style={{ color: 'text.primary' }}>
+                  <Link component="button" variant="body2" onClick={goToRegister} style={{ color: 'text.primary' }}>
+                    Don't have an account yet? Register!
                   </Link>
                 </Typography>
-                {backendMessage && <Typography variant="body2" color="error">{backendMessage}</Typography>}
               </div>
             </Grid>
             <Grid item xs={12} md={6}>
               {randomImage && (
-                <div className="flex justify-center items-center h-full">
-                  <div className="p-2">
-                    <img src={randomImage.url} alt={randomImage.alt} className="max-w-full max-h-full" />
-                  </div>
+                <div style={{
+                  height: '100%',
+                  borderRadius: '0.5rem',
+                  background: `url(${randomImage.url}) center/cover no-repeat`,
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                }}>
                 </div>
               )}
             </Grid>
@@ -143,6 +156,6 @@ const LoginPage = () => {
       </div>
     </ThemeSwitcher>
   );
-}
+};
 
 export default LoginPage;

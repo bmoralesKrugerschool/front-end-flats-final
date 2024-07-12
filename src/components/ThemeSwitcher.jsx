@@ -1,4 +1,3 @@
-// ThemeSwitcher.jsx
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { IconButton, Box, CssBaseline } from '@mui/material';
 import { Brightness4, Brightness7, Monitor } from '@mui/icons-material';
@@ -56,7 +55,7 @@ const ThemeSwitcher = ({ children }) => {
       ...(themeMode === 'dark' || (themeMode === 'auto' && isSystemDark) ? {
         background: {
           default: '#352F44',
-          paper: '#352F44',
+          paper: '#B9B4C7',
         },
         text: {
           primary: '#FAF0E6',
@@ -74,7 +73,7 @@ const ThemeSwitcher = ({ children }) => {
       } : {
         background: {
           default: '#FAF0E6',
-          paper: '#FAF0E6',
+          paper: '#B9B4C7',
         },
         text: {
           primary: '#352F44',
