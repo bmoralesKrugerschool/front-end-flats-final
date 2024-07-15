@@ -1,136 +1,83 @@
 import React, { useState } from 'react';
+import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText, ListItemIcon, Box, Divider } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import HomeIcon from '@mui/icons-material/Home';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import SettingsIcon from '@mui/icons-material/Settings';
+import InfoIcon from '@mui/icons-material/Info';
 import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, Button, Avatar } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
-import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
-  const { isAuthenticated, user, logout } = useAuth();
-  console.log(isAuthenticated, user )
-  console.log('user', user.user.name , user)
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+  const toggleDrawer = (open) => () => {
+    setDrawerOpen(open);
   };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
-  const handleLogout = () => {
-    logout();
-    handleMenuClose();
-  };
-
-  const getInitials = (name) => {
-    console.log('name', name)
-    if (!name) return 'UF';
-    const names = user.user.name.split(' ');
-    return names.map((n) => n[0]).join('');
-  };
-
-  const menuId = 'primary-search-account-menu';
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Mi Perfil</MenuItem>
-      <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
-    </Menu>
-  );
-
-  const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      {[<MenuItem key="inicio" component={Link} to="/flats">Inicio</MenuItem>,
-        <MenuItem key="categorias" component={Link} to="/">Categorías</MenuItem>,
-        <MenuItem key="filtros" component={Link} to="/filters">Filtros</MenuItem>,
-        <MenuItem key="sobre" component={Link} to="/about">Sobre</MenuItem>,
-        <MenuItem key="faq" component={Link} to="/faq">FAQ</MenuItem>,
-        isAuthenticated && (
-          <MenuItem key="miPerfil" onClick={handleProfileMenuOpen}>Mi Perfil</MenuItem>
-        ),
-        isAuthenticated && (
-          <MenuItem key="cerrarSesion" onClick={handleLogout}>Cerrar Sesión</MenuItem>
-        ),
-      ]}
-    </Menu>
-  );
+  const menuItems = [
+    { text: 'Home', icon: <HomeIcon />, path: '/' },
+    { text: 'Filter', icon: <FilterListIcon />, path: '/filter' },
+    { text: 'Configuration', icon: <SettingsIcon />, path: '/configuration' },
+    { text: 'About', icon: <InfoIcon />, path: '/about' },
+  ];
 
   return (
-    <div>
-      <AppBar position="fixed">
+    <>
+      <AppBar position="static" sx={{ bgcolor: '#5C5470' }}>
         <Toolbar>
-          <Typography variant="h6" noWrap component={Link} to="/flats" style={{ color: 'inherit', textDecoration: 'none' }}>
-            LOGO
-          </Typography>
-          <div style={{ flexGrow: 1 }} />
-          <div style={{ display: 'flex' }}>
-            <Button color="inherit" component={Link} to="/flats">Products</Button>
-            <Button color="inherit" component={Link} to="/">Pricing</Button>
-            <Button color="inherit" component={Link} to="/blog">Blog</Button>
-            {isAuthenticated ? (
-              <IconButton
-                edge="end"
-                aria-label="account of current user"
-                aria-controls={menuId}
-                aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
-                color="inherit"
-              >
-                {user.user.photoURL ? (
-                  <Avatar alt={user.user.name} src={user.user.photoURL} />
-                ) : (
-                  <Avatar>{getInitials(user.user.name)}</Avatar>
-                )}
-              </IconButton>
-            ) : (
-              <Button color="inherit" component={Link} to="/login">Login</Button>
-            )}
-          </div>
-          <IconButton
-            edge="end"
-            color="inherit"
-            aria-label="open drawer"
-            aria-controls={mobileMenuId}
-            aria-haspopup="true"
-            onClick={handleMobileMenuOpen}
-          >
-            <MenuIcon />
-          </IconButton>
+          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleDrawer(true)}
+              sx={{ display: { xs: 'block', sm: 'none' } }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' }, color: '#FAF0E6' }}>
+              Real Estate App
+            </Typography>
+            <Box sx={{ display: { xs: 'none', sm: 'flex' }, color: '#FAF0E6' }}>
+              {menuItems.map((item) => (
+                <Link key={item.text} to={item.path} style={{ color: 'inherit', textDecoration: 'none', marginLeft: '16px' }}>
+                  <IconButton color="inherit" aria-label={item.text} sx={{ display: 'flex', flexDirection: 'column' }}>
+                    {item.icon}
+                    <Typography variant="caption">{item.text}</Typography>
+                  </IconButton>
+                </Link>
+              ))}
+            </Box>
+          </Box>
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
-    </div>
+      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
+        <Box
+          sx={{
+            width: 250,
+            bgcolor: '#352F44',
+            color: '#FAF0E6',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}
+        >
+          <List>
+            {menuItems.map((item) => (
+              <ListItem button key={item.text} component={Link} to={item.path} onClick={toggleDrawer(false)} sx={{ color: '#FAF0E6' }}>
+                <ListItemIcon sx={{ color: '#FAF0E6' }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          <Box sx={{ textAlign: 'center', py: 2 }}>
+            <Typography variant="body2">&copy; 2024 Real Estate App</Typography>
+          </Box>
+        </Box>
+      </Drawer>
+    </>
   );
 };
 

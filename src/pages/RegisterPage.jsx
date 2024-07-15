@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { Button, TextField, Typography, Container, Grid, IconButton, Link, Box } from '@mui/material';
+import { Button, TextField, Typography, Container, Grid, IconButton, Link, Box, Alert } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -46,21 +46,36 @@ const RegisterPage = () => {
   
     fetchImage();
   }, []);
-  
 
   const onSubmit = async (data) => {
     try {
+      const emailExists = await checkEmailExists(data.email);
+      if (emailExists) {
+        setBackendMessage('Email already exists. Please use a different email.');
+        return;
+      }
+
       const formattedBirthdate = data.birthDate.replace(/-/g, '/');
       const modifiedData = { ...data, birthDate: formattedBirthdate };
 
       const response = await signUp(modifiedData);
-      setBackendMessage(response.message);
+      setBackendMessage('User created successfully!');
       if (response.data && response.data.token) {
         navigate('/flats');
       }
     } catch (error) {
       console.error('Error registering user:', error);
       setBackendMessage(error.message);
+    }
+  };
+
+  const checkEmailExists = async (email) => {
+    try {
+      const response = await axios.get(`YOUR_BACKEND_URL/check-email?email=${encodeURIComponent(email)}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking email:', error);
+      return false;
     }
   };
 
@@ -77,6 +92,11 @@ const RegisterPage = () => {
     return age >= 18;
   };
 
+  const validatePassword = (value) => {
+    const passwordRegex = /^(?=.*\d)(?=.*[A-Z])(?=.*[!@#$%^&*()_+])[0-9a-zA-Z!@#$%^&*()_+]{8,20}$/;
+    return passwordRegex.test(value);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
       <Box sx={{
@@ -87,6 +107,7 @@ const RegisterPage = () => {
         overflow: 'hidden',
         boxShadow: themeMode === 'dark' ? '0 4px 12px rgba(0, 0, 0, 0.5)' : '0 4px 12px rgba(0, 0, 0, 0.1)',
         bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
+        position: 'relative',
       }}>
         {/* Image Box */}
         <Box sx={{
@@ -173,6 +194,15 @@ const RegisterPage = () => {
                     minLength: {
                       value: 8,
                       message: 'Password must be at least 8 characters long'
+                    },
+                    maxLength: {
+                      value: 20,
+                      message: 'Password must be at most 20 characters long'
+                    },
+                    validate: {
+                      containsDigit: value => /\d/.test(value) || 'Password must contain at least one digit',
+                      containsUppercase: value => /[A-Z]/.test(value) || 'Password must contain at least one uppercase letter',
+                      containsSymbol: value => /[!@#$%^&*()_+]/.test(value) || 'Password must contain at least one symbol (!@#$%^&*()_+)'
                     }
                   })}
                   label="Password"
@@ -222,7 +252,21 @@ const RegisterPage = () => {
             Already have an account? <Link href="/" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Login!</Link>
           </Typography>
           
-          {backendMessage && <Typography variant="body2" sx={{ color: 'error.main', mt: 2 }}>{backendMessage}</Typography>}
+          {backendMessage && (
+            <Alert sx={{
+              position: 'absolute',
+              bottom: '20px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '100%',
+              maxWidth: '500px',
+              bgcolor: '#5C5470',
+              color: '#FAF0E6',
+              '& .MuiAlert-icon': {
+                color: '#FAF0E6'
+              }
+            }}>{backendMessage}</Alert>
+          )}
         </Box>
       </Box>
     </Container>
