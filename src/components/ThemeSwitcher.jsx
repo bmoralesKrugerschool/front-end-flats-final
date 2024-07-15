@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { IconButton, Box, CssBaseline } from '@mui/material';
-import { Brightness4, Brightness7, Monitor } from '@mui/icons-material';
+import { Brightness4, Brightness7 } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const ThemeContext = createContext();
@@ -8,87 +8,48 @@ const ThemeContext = createContext();
 export const useTheme = () => useContext(ThemeContext);
 
 const ThemeSwitcher = ({ children }) => {
-  const [themeMode, setThemeMode] = useState('auto');
-  const [isSystemDark, setIsSystemDark] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const [themeMode, setThemeMode] = useState('light');
 
   const updateThemeMode = (mode) => {
     setThemeMode(mode);
     localStorage.setItem('theme', mode);
-    document.documentElement.classList.toggle('dark', mode === 'dark' || (mode === 'auto' && isSystemDark));
+    document.documentElement.classList.toggle('dark', mode === 'dark');
   };
 
   const toggleThemeMode = () => {
-    const newMode = themeMode === 'light' ? 'dark' : themeMode === 'dark' ? 'auto' : 'light';
+    const newMode = themeMode === 'light' ? 'dark' : 'light';
     updateThemeMode(newMode);
   };
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') || 'auto';
-    setThemeMode(storedTheme);
-    document.documentElement.classList.toggle('dark', storedTheme === 'dark' || (storedTheme === 'auto' && isSystemDark));
-
-    const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    const handleChange = (event) => {
-      setIsSystemDark(event.matches);
-      if (themeMode === 'auto') {
-        document.documentElement.classList.toggle('dark', event.matches);
-      }
-    };
-
-    darkModeMediaQuery.addEventListener('change', handleChange);
-
-    return () => {
-      darkModeMediaQuery.removeEventListener('change', handleChange);
-    };
-  }, [themeMode, isSystemDark]);
+    const storedTheme = localStorage.getItem('theme') || 'light';
+    updateThemeMode(storedTheme);
+  }, []);
 
   const getIcon = () => {
-    if (themeMode === 'light') return <Brightness7 />;
-    if (themeMode === 'dark') return <Brightness4 />;
-    return <Monitor />;
+    return themeMode === 'light' ? <Brightness4 /> : <Brightness7 />;
   };
 
   const theme = createTheme({
     palette: {
-      mode: themeMode === 'dark' || (themeMode === 'auto' && isSystemDark) ? 'dark' : 'light',
-      ...(themeMode === 'dark' || (themeMode === 'auto' && isSystemDark) ? {
-        background: {
-          default: '#352F44',
-          paper: '#B9B4C7',
-        },
-        text: {
-          primary: '#FAF0E6',
-          secondary: 'rgba(250, 240, 230, 0.7)',
-        },
-        action: {
-          disabled: '#5C5470',
-        },
-        primary: {
-          main: '#FAF0E6',
-        },
-        secondary: {
-          main: '#FAF0E6',
-        }
-      } : {
-        background: {
-          default: '#FAF0E6',
-          paper: '#B9B4C7',
-        },
-        text: {
-          primary: '#352F44',
-          secondary: 'rgba(53, 47, 68, 0.7)',
-        },
-        action: {
-          disabled: '#B9B4C7',
-        },
-        primary: {
-          main: '#352F44',
-        },
-        secondary: {
-          main: '#352F44',
-        }
-      }),
+      mode: themeMode === 'dark' ? 'dark' : 'light',
+      background: {
+        default: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
+        paper: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
+      },
+      text: {
+        primary: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
+        secondary: themeMode === 'dark' ? 'rgba(250, 240, 230, 0.7)' : 'rgba(53, 47, 68, 0.7)',
+      },
+      action: {
+        disabled: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
+      },
+      primary: {
+        main: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
+      },
+      secondary: {
+        main: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
+      }
     },
   });
 
@@ -107,9 +68,9 @@ const ThemeSwitcher = ({ children }) => {
             onClick={toggleThemeMode}
             color="primary"
             sx={{
-              backgroundColor: 'background.paper',
+              backgroundColor: theme.palette.background.paper,
               '&:hover': {
-                backgroundColor: 'background.default',
+                backgroundColor: theme.palette.background.default,
               }
             }}
           >
