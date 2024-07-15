@@ -11,16 +11,36 @@ const LoginPage = () => {
 
   useEffect(() => {
     const fetchImage = async () => {
+      const unsplashClientId = '2eICAWSF-EYZL2BumHCsX9C9DFsug-npLoFPQw01_Ok';
+      const unsplashUrl = `https://api.unsplash.com/photos/random?query=house,apartment,indoor&client_id=${unsplashClientId}`;
+      const pexelsApiKey = 'wY4V6AsdbhHxYHQ8lDDYf6gki3NuL9KJRA6cKEAiKHq0uJSIttxXs6yX';
+      const pexelsUrl = `https://api.pexels.com/v1/search?query=house+apartment+indoor&per_page=1&page=${Math.floor(Math.random() * 10) + 1}`;
+  
       try {
-        const response = await axios.get('https://api.unsplash.com/photos/random?query=house,apartment&client_id=2eICAWSF-EYZL2BumHCsX9C9DFsug-npLoFPQw01_Ok');
+        const response = await axios.get(unsplashUrl);
         setBackgroundImage(response.data.urls.regular);
       } catch (error) {
-        console.error('Error fetching the image:', error);
+        console.error('Error fetching image from Unsplash:', error);
+        console.log('Trying alternative API (Pexels)...');
+  
+        try {
+          const alternativeResponse = await axios.get(pexelsUrl, {
+            headers: {
+              Authorization: pexelsApiKey
+            }
+          });
+  
+          setBackgroundImage(alternativeResponse.data.photos[0].src.large);
+        } catch (alternativeError) {
+          console.error('Error fetching image from Pexels:', alternativeError);
+        }
       }
     };
   
     fetchImage();
   }, []);
+  
+  
 
   return (
     <Container maxWidth="lg" sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>

@@ -1,33 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash, FaAdjust } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { Button, TextField, Typography, Container, Grid, IconButton, Link, Box } from '@mui/material';
+import { useTheme } from '../components/ThemeSwitcher';
 import { useAuth } from '../context/AuthContext';
-import { Button, TextField, Typography, Container, Grid, IconButton } from '@mui/material';
+import axios from 'axios';
 
 const RegisterPage = () => {
-  const { register, handleSubmit, formState: { errors }, clearErrors, setError } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
   const { signUp } = useAuth();
   const navigate = useNavigate();
-  const [themeMode, setThemeMode] = useState('auto');
+  const { themeMode } = useTheme();
+  const [backgroundImage, setBackgroundImage] = useState('');
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme');
-    const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initialTheme = storedTheme || (prefersDarkMode ? 'dark' : 'light');
-
-    setThemeMode(initialTheme);
-    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+    const fetchImage = async () => {
+      const unsplashClientId = '2eICAWSF-EYZL2BumHCsX9C9DFsug-npLoFPQw01_Ok';
+      const unsplashUrl = `https://api.unsplash.com/photos/random?query=house,apartment,indoor&client_id=${unsplashClientId}`;
+      const pexelsApiKey = 'wY4V6AsdbhHxYHQ8lDDYf6gki3NuL9KJRA6cKEAiKHq0uJSIttxXs6yX';
+      const pexelsUrl = `https://api.pexels.com/v1/search?query=house+apartment+indoor&per_page=1&page=${Math.floor(Math.random() * 10) + 1}`;
+  
+      try {
+        const response = await axios.get(unsplashUrl);
+        setBackgroundImage(response.data.urls.regular);
+      } catch (error) {
+        console.error('Error fetching image from Unsplash:', error);
+        console.log('Trying alternative API (Pexels)...');
+  
+        try {
+          const alternativeResponse = await axios.get(pexelsUrl, {
+            headers: {
+              Authorization: pexelsApiKey
+            }
+          });
+  
+          setBackgroundImage(alternativeResponse.data.photos[0].src.large);
+        } catch (alternativeError) {
+          console.error('Error fetching image from Pexels:', alternativeError);
+        }
+      }
+    };
+  
+    fetchImage();
   }, []);
-
-  const toggleThemeMode = () => {
-    const newThemeMode = themeMode === 'light' ? 'dark' : themeMode === 'dark' ? 'auto' : 'light';
-    setThemeMode(newThemeMode);
-    document.documentElement.classList.toggle('dark', newThemeMode === 'dark');
-    localStorage.setItem('theme', newThemeMode);
-  };
+  
 
   const onSubmit = async (data) => {
     try {
@@ -58,32 +77,49 @@ const RegisterPage = () => {
     return age >= 18;
   };
 
-  const goToLogin = () => {
-    navigate('/');
-  };
-
-  const themeButtonText = {
-    light: 'Switch to Dark Mode',
-    dark: 'Switch to Light Mode',
-    auto: 'Switch to Auto Mode'
-  }[themeMode];
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 font-sans">
-      <Container maxWidth="sm">
-        <div className="bg-gray-800 w-full max-w-md p-10 rounded-md shadow-md">
-          <Typography variant="h4" align="center" color="textPrimary" gutterBottom>
+    <Container maxWidth="lg" sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
+      <Box sx={{
+        display: 'flex',
+        width: '98%',
+        height: '50vh',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        boxShadow: themeMode === 'dark' ? '0 4px 12px rgba(0, 0, 0, 0.5)' : '0 4px 12px rgba(0, 0, 0, 0.1)',
+        bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
+      }}>
+        {/* Image Box */}
+        <Box sx={{
+          width: '61vh',
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          borderRadius: '10px 0 0 10px',
+        }} />
+        
+        {/* Form Box */}
+        <Box sx={{
+          width: '61vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          p: 4,
+          borderRadius: '0 10px 10px 0',
+          bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
+        }}>
+          <Typography variant="h4" component="h1" sx={{ mb: 4, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             REGISTER
           </Typography>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   id="name"
                   {...register('name', { required: 'First name is required' })}
                   label="First Name"
                   fullWidth
-                  variant="filled"
+                  variant="outlined"
                   className={`mb-4 ${errors.name ? 'border border-red-500' : ''}`}
                   InputProps={{
                     startAdornment: <FaUser className="text-gray-400" />
@@ -92,13 +128,13 @@ const RegisterPage = () => {
                   helperText={errors.name && errors.name.message}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   id="lastName"
                   {...register('lastName', { required: 'Last name is required' })}
                   label="Last Name"
                   fullWidth
-                  variant="filled"
+                  variant="outlined"
                   className={`mb-4 ${errors.lastName ? 'border border-red-500' : ''}`}
                   InputProps={{
                     startAdornment: <FaUser className="text-gray-400" />
@@ -119,7 +155,7 @@ const RegisterPage = () => {
                   })}
                   label="Email"
                   fullWidth
-                  variant="filled"
+                  variant="outlined"
                   className={`mb-4 ${errors.email ? 'border border-red-500' : ''}`}
                   InputProps={{
                     startAdornment: <FaEnvelope className="text-gray-400" />
@@ -141,7 +177,7 @@ const RegisterPage = () => {
                   })}
                   label="Password"
                   fullWidth
-                  variant="filled"
+                  variant="outlined"
                   className={`mb-4 ${errors.password ? 'border border-red-500' : ''}`}
                   InputProps={{
                     startAdornment: <FaLock className="text-gray-400" />,
@@ -165,7 +201,7 @@ const RegisterPage = () => {
                   })}
                   label="Birthdate"
                   fullWidth
-                  variant="filled"
+                  variant="outlined"
                   className={`mb-4 ${errors.birthDate ? 'border border-red-500' : ''}`}
                   InputProps={{
                     startAdornment: <FaBirthdayCake className="text-gray-400" />
@@ -175,54 +211,22 @@ const RegisterPage = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  id="role"
-                  select
-                  {...register('role', { required: 'Role is required' })}
-                  label="Role"
-                  fullWidth
-                  variant="filled"
-                  className={`mb-4 ${errors.role ? 'border border-red-500' : ''}`}
-                  InputProps={{
-                    startAdornment: <FaUser className="text-gray-400" />
-                  }}
-                  error={!!errors.role}
-                  helperText={errors.role && errors.role.message}
-                >
-                  <option value="">Select Role</option>
-                  <option value="landlord">Landlord</option>
-                  <option value="renter">Renter</option>
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
-                <Button type="submit" fullWidth variant="contained" color="primary">
+                <Button type="submit" fullWidth variant="contained" sx={{ bgcolor: themeMode === 'dark' ? '#FAF0E6' : '#352F44', color: themeMode === 'dark' ? '#352F44' : '#FAF0E6', mb: 2 }}>
                   Create your user
                 </Button>
               </Grid>
             </Grid>
           </form>
           
-          <Button
-            type="button"
-            fullWidth
-            variant="outlined"
-            onClick={goToLogin}
-            className="mb-4"
-          >
-            Login
-          </Button>
+          <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+            Already have an account? <Link href="/" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Login!</Link>
+          </Typography>
           
-          <div className="flex justify-center">
-            <Button variant="text" onClick={toggleThemeMode} startIcon={<FaAdjust className="mr-2" />}>
-              {themeButtonText}
-            </Button>
-          </div>
-          
-          {backendMessage && <Typography variant="body2" color="error" className="mt-4">{backendMessage}</Typography>}
-        </div>
-      </Container>
-    </div>
+          {backendMessage && <Typography variant="body2" sx={{ color: 'error.main', mt: 2 }}>{backendMessage}</Typography>}
+        </Box>
+      </Box>
+    </Container>
   );
-}
+};
 
 export default RegisterPage;
