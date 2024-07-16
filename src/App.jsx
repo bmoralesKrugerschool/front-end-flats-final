@@ -13,13 +13,14 @@ import AboutPage from './pages/AboutPage';
 const AppContent = () => {
   const location = useLocation();
 
-  const isAuthPage = location.pathname === '/' || location.pathname === '/register';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   return (
     <>
       {!isAuthPage && <Navbar />}
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<Flats/>} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/profile" element={<ProtectedRoute><h1>Profile</h1></ProtectedRoute>} />
         <Route path="/about" element={<AboutPage />} />
