@@ -62,7 +62,6 @@ const FlatsPage = () => {
 
   return (
     <div className="relative">
-      <Navbar />
       <div className="flex items-center justify-center min-h-screen bg-[#352F44] p-4">
         <div className="bg-[#5C5470] w-full max-w-4xl p-10 rounded-md shadow-md">
           <h2 className="text-2xl text-center text-[#FAF0E6] mb-4">Available Flats</h2>
