@@ -4,10 +4,15 @@ import { useTheme } from '../components/ThemeSwitcher';
 import axios from 'axios';
 import MailIcon from '@mui/icons-material/Mail';
 import LockIcon from '@mui/icons-material/Lock';
+import { useNavigate } from 'react-router-dom'; // Importamos useNavigate para la navegación
 
 const LoginPage = () => {
   const { themeMode } = useTheme();
   const [backgroundImage, setBackgroundImage] = useState('');
+  const [email, setEmail] = useState(''); // Estado para el email
+  const [password, setPassword] = useState(''); // Estado para la contraseña
+  const [backendMessage, setBackendMessage] = useState(''); // Estado para mensajes de error
+  const navigate = useNavigate(); // Hook de navegación
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -40,8 +45,36 @@ const LoginPage = () => {
     fetchImage();
   }, []);
   
-  
+  const signIn = async (data) => {
+    // Implementar la llamada a la API de login
+    const apiUrl = 'http://localhost:3006/api/v1/user/login'; // Reemplaza con tu URL de API
+    try {
+      const response = await axios.post(apiUrl, data);
+      return response.data;
+    } catch (error) {
+      console.error('API login error:', error);
+      throw error;
+    }
+  };
 
+  const onSubmit = async (e) => {
+    e.preventDefault(); // Prevenir la recarga de la página
+    try {
+      const data = { email, password };
+      const response = await signIn(data);
+
+      if (response.code === 200) {
+        localStorage.setItem('token', response.token);
+        navigate('/flats');
+      } else {
+        setBackendMessage(response.message || 'An error occurred during login. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error signing in:', error);
+      setBackendMessage('An error occurred during login. Please try again.');
+    }
+  };
+  
   return (
     <Container maxWidth="lg" sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
       <Box sx={{
@@ -50,7 +83,6 @@ const LoginPage = () => {
         alignItems: 'stretch',
         height: '50vh',
       }}>
-        {/* Box del formulario*/}
         <Box sx={{
           width: '60vh',
           display: 'flex',
@@ -69,6 +101,8 @@ const LoginPage = () => {
             fullWidth
             variant="outlined"
             label="Email"
+            value={email} // Añadir valor del estado
+            onChange={(e) => setEmail(e.target.value)} // Manejador de cambio
             InputLabelProps={{
               style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
             }}
@@ -83,6 +117,8 @@ const LoginPage = () => {
             variant="outlined"
             label="Password"
             type="password"
+            value={password} // Añadir valor del estado
+            onChange={(e) => setPassword(e.target.value)} // Manejador de cambio
             InputLabelProps={{
               style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
             }}
@@ -100,15 +136,19 @@ const LoginPage = () => {
               color: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
               mb: 2
             }}
+            onClick={onSubmit} // Manejador de click
           >
             LOGIN
           </Button>
+          {backendMessage && (
+            <Typography variant="body2" sx={{ color: 'red', mb: 2 }}>
+              {backendMessage}
+            </Typography>
+          )}
           <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             Don't have an account yet? <Link href="/register" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Register!</Link>
           </Typography>
         </Box>
-        
-        {/* Box de la foto traída por la API */}
         <Box sx={{
           width: '60vh',
           height: '100%',
