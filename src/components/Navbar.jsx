@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText, ListItemIcon, Box, Divider, Collapse } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText, ListItemIcon, Box, Divider, Badge, CssBaseline, Collapse } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -8,99 +8,153 @@ import InfoIcon from '@mui/icons-material/Info';
 import PersonIcon from '@mui/icons-material/Person';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ApartmentIcon from '@mui/icons-material/Apartment';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import UploadIcon from '@mui/icons-material/Upload';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from 'react-router-dom';
+import { useTheme } from './ThemeSwitcher';
 
-const Navbar = () => {
+const Navbar = ({ isLoggedIn, notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [youOpen, setYouOpen] = useState(false);
   const { themeMode } = useTheme();
 
-  const toggleDrawer = (open) => () => {
-    setDrawerOpen(open);
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
   };
 
-  const handleYouClick = () => {
+  const toggleYou = () => {
     setYouOpen(!youOpen);
   };
 
   const menuItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
     { text: 'Filter', icon: <FilterListIcon />, path: '/filter' },
-    {
-      text: 'You',
-      icon: <PersonIcon />,
-      subItems: [
-        { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
-        { text: 'Favorites', icon: <FavoriteIcon />, path: '/favorites' },
-        { text: 'My Flats', icon: <ApartmentIcon />, path: '/myflats' },
-      ],
-    },
     { text: 'Configuration', icon: <SettingsIcon />, path: '/configuration' },
     { text: 'About', icon: <InfoIcon />, path: '/about' },
   ];
 
+  const youItems = [
+    { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
+    { text: 'Favorites', icon: <FavoriteIcon />, path: '/favorites' },
+    { text: 'My Flats', icon: <ApartmentIcon />, path: '/myflats' },
+  ];
+
   return (
     <>
-      <AppBar position="static" sx={{ bgcolor: themeMode === 'dark' ? '#5C5470' : '#352F44' }}>
+      <CssBaseline />
+      <AppBar position="static" sx={{ bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
         <Toolbar>
           <IconButton
             edge="start"
             color="inherit"
             aria-label="menu"
-            onClick={toggleDrawer(true)}
+            onClick={toggleDrawer}
             sx={{ mr: 2 }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1, color: '#FAF0E6' }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             FlatTopia
           </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton color="inherit" component={Link} to="/upload">
+              <UploadIcon />
+            </IconButton>
+            <IconButton color="inherit" component={Link} to="/notifications">
+              <Badge color="secondary" badgeContent={notifications}>
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+            <IconButton color="inherit" component={Link} to={isLoggedIn ? "/profile" : "/login"}>
+              <PersonIcon />
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
-      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-        <Box
-          sx={{
-            width: 250,
+      <Drawer
+        variant="permanent"
+        open={drawerOpen}
+        onClose={toggleDrawer}
+        sx={{
+          width: drawerOpen ? 240 : 60,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerOpen ? 240 : 60,
+            boxSizing: 'border-box',
             bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
             color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-            height: '100%',
+            overflowX: 'hidden',
+            paddingTop: '1.45vh',
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: drawerOpen ? 'flex-end' : 'center',
+            px: 2,
+            py: 1,
+          }}
+        >
+          <IconButton onClick={toggleDrawer} color="inherit">
+            <MenuIcon />
+          </IconButton>
+        </Box>
+        <Divider />
+        <Box
+          sx={{
+            overflow: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            height: '100%'
           }}
         >
           <List>
-            {menuItems.map((item) =>
-              item.subItems ? (
-                <Box key={item.text}>
-                  <ListItem button onClick={handleYouClick} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                    <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
-                    <ListItemText primary={item.text} />
-                    {youOpen ? <ExpandLess /> : <ExpandMore />}
-                  </ListItem>
-                  <Collapse in={youOpen} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                      {item.subItems.map((subItem) => (
-                        <ListItem button key={subItem.text} component={Link} to={subItem.path} onClick={toggleDrawer(false)} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', pl: 4 }}>
-                          <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{subItem.icon}</ListItemIcon>
-                          <ListItemText primary={subItem.text} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Collapse>
-                </Box>
-              ) : (
-                <ListItem button key={item.text} component={Link} to={item.path} onClick={toggleDrawer(false)} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                  <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.text} />
+            {menuItems.map((item) => (
+              <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} sx={{ display: drawerOpen ? 'block' : 'none' }} />
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          <List>
+            {drawerOpen && (
+              <>
+                <ListItem button onClick={toggleYou} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                  <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                    <PersonIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="You" sx={{ display: drawerOpen ? 'block' : 'none' }} />
+                  {youOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </ListItem>
-              )
+                <Collapse in={youOpen && drawerOpen} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {youItems.map((item) => (
+                      <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', pl: 4 }}>
+                        <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.text} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
             )}
           </List>
           <Divider />
-          <Box sx={{ textAlign: 'center', py: 2 }}>
+          <List>
+            {menuItems.slice(2).map((item) => (
+              <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} sx={{ display: drawerOpen ? 'block' : 'none' }} />
+              </ListItem>
+            ))}
+          </List>
+          <Box sx={{ textAlign: 'center', py: 2, display: drawerOpen ? 'block' : 'none' }}>
             <Typography variant="body2">&copy; 2024 FlatTopia</Typography>
           </Box>
         </Box>
