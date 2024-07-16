@@ -5,6 +5,7 @@ import axios from 'axios';
 import MailIcon from '@mui/icons-material/Mail';
 import LockIcon from '@mui/icons-material/Lock';
 import { useNavigate } from 'react-router-dom'; // Importamos useNavigate para la navegación
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const { themeMode } = useTheme();
@@ -13,6 +14,10 @@ const LoginPage = () => {
   const [password, setPassword] = useState(''); // Estado para la contraseña
   const [backendMessage, setBackendMessage] = useState(''); // Estado para mensajes de error
   const navigate = useNavigate(); // Hook de navegación
+  const { signIn } = useAuth();
+  
+  
+
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -45,17 +50,7 @@ const LoginPage = () => {
     fetchImage();
   }, []);
   
-  const signIn = async (data) => {
-    // Implementar la llamada a la API de login
-    const apiUrl = 'http://localhost:3006/api/v1/user/login'; // Reemplaza con tu URL de API
-    try {
-      const response = await axios.post(apiUrl, data);
-      return response.data;
-    } catch (error) {
-      console.error('API login error:', error);
-      throw error;
-    }
-  };
+  
 
   const onSubmit = async (e) => {
     e.preventDefault(); // Prevenir la recarga de la página

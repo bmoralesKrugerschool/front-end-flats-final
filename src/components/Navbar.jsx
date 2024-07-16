@@ -6,6 +6,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoIcon from '@mui/icons-material/Info';
 import { Link } from 'react-router-dom';
+import { login as loginUser } from '../servers/auth';
 
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
