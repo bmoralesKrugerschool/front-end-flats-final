@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button, Typography, Container, Link } from '@mui/material';
+import { Box, TextField, Button, Typography, Container, Link, Snackbar } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
 import axios from 'axios';
 import MailIcon from '@mui/icons-material/Mail';
 import LockIcon from '@mui/icons-material/Lock';
-import { useNavigate } from 'react-router-dom'; // Importamos useNavigate para la navegación
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const { themeMode } = useTheme();
   const [backgroundImage, setBackgroundImage] = useState('');
-  const [email, setEmail] = useState(''); // Estado para el email
-  const [password, setPassword] = useState(''); // Estado para la contraseña
-  const [backendMessage, setBackendMessage] = useState(''); // Estado para mensajes de error
-  const navigate = useNavigate(); // Hook de navegación
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [backendMessage, setBackendMessage] = useState('');
+  const [showAlert, setShowAlert] = useState(false); // Estado para mostrar la alerta
+  const navigate = useNavigate();
   const { signIn } = useAuth();
-  
-  
-
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -25,35 +23,39 @@ const LoginPage = () => {
       const unsplashUrl = `https://api.unsplash.com/photos/random?query=house,apartment,indoor&client_id=${unsplashClientId}`;
       const pexelsApiKey = 'wY4V6AsdbhHxYHQ8lDDYf6gki3NuL9KJRA6cKEAiKHq0uJSIttxXs6yX';
       const pexelsUrl = `https://api.pexels.com/v1/search?query=house+apartment+indoor&per_page=1&page=${Math.floor(Math.random() * 10) + 1}`;
-  
+
       try {
         const response = await axios.get(unsplashUrl);
         setBackgroundImage(response.data.urls.regular);
       } catch (error) {
         console.error('Error fetching image from Unsplash:', error);
         console.log('Trying alternative API (Pexels)...');
-  
+
         try {
           const alternativeResponse = await axios.get(pexelsUrl, {
             headers: {
               Authorization: pexelsApiKey
             }
           });
-  
+
           setBackgroundImage(alternativeResponse.data.photos[0].src.large);
         } catch (alternativeError) {
           console.error('Error fetching image from Pexels:', alternativeError);
         }
       }
     };
-  
+
     fetchImage();
   }, []);
-  
-  
 
   const onSubmit = async (e) => {
-    e.preventDefault(); // Prevenir la recarga de la página
+    e.preventDefault();
+
+    if (!email || !password) {
+      setShowAlert(true); // Mostrar la alerta si los campos están vacíos
+      return;
+    }
+
     try {
       const data = { email, password };
       const response = await signIn(data);
@@ -69,7 +71,11 @@ const LoginPage = () => {
       setBackendMessage('An error occurred during login. Please try again.');
     }
   };
-  
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
       <Box sx={{
@@ -96,8 +102,8 @@ const LoginPage = () => {
             fullWidth
             variant="outlined"
             label="Email"
-            value={email} // Añadir valor del estado
-            onChange={(e) => setEmail(e.target.value)} // Manejador de cambio
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             InputLabelProps={{
               style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
             }}
@@ -112,8 +118,8 @@ const LoginPage = () => {
             variant="outlined"
             label="Password"
             type="password"
-            value={password} // Añadir valor del estado
-            onChange={(e) => setPassword(e.target.value)} // Manejador de cambio
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             InputLabelProps={{
               style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
             }}
@@ -131,7 +137,7 @@ const LoginPage = () => {
               color: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
               mb: 2
             }}
-            onClick={onSubmit} // Manejador de click
+            onClick={onSubmit}
           >
             LOGIN
           </Button>
@@ -143,8 +149,8 @@ const LoginPage = () => {
           <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             Don't have an account yet? <Link href="/register" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Register!</Link>
           </Typography>
-          <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-          Did you forget your password, change it? <Link href="/send-code" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Reset Password!</Link>
+          <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', mt: 1 }}>
+            Forgot your password? <Link href="/reset-password" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Reset Password!</Link>
           </Typography>
         </Box>
         <Box sx={{
@@ -156,6 +162,14 @@ const LoginPage = () => {
           borderRadius: '0 2px 2px 0',
         }} />
       </Box>
+      {/* Snackbar para mostrar alerta de campos vacíos */}
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        message="Please fill in both email and password fields."
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      />
     </Container>
   );
 };
