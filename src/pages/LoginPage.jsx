@@ -144,7 +144,7 @@ const LoginPage = () => {
             Don't have an account yet? <Link href="/register" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Register!</Link>
           </Typography>
           <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-            Don't have an account yet? <Link href="/" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Register!</Link>
+          Did you forget your password, change it? <Link href="/send-code" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Reset Password!</Link>
           </Typography>
         </Box>
         <Box sx={{
