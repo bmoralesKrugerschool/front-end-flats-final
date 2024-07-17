@@ -1,5 +1,21 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText, ListItemIcon, Box, Divider, Badge, CssBaseline, Collapse, TextField, InputAdornment } from '@mui/material';
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Box,
+  Divider,
+  Badge,
+  CssBaseline,
+  Collapse,
+  InputBase
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -10,9 +26,9 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import UploadIcon from '@mui/icons-material/Upload';
-import SearchIcon from '@mui/icons-material/Search';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SearchIcon from '@mui/icons-material/Search';
 import { Link } from 'react-router-dom';
 import { useTheme } from './ThemeSwitcher';
 
@@ -32,14 +48,17 @@ const Navbar = ({ isLoggedIn, notifications }) => {
   const menuItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
     { text: 'Filter', icon: <FilterListIcon />, path: '/filter' },
-    { text: 'Configuration', icon: <SettingsIcon />, path: '/configuration' },
-    { text: 'About', icon: <InfoIcon />, path: '/about' },
   ];
 
   const youItems = [
     { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
     { text: 'Favorites', icon: <FavoriteIcon />, path: '/favorites' },
     { text: 'My Flats', icon: <ApartmentIcon />, path: '/myflats' },
+  ];
+
+  const settingsItems = [
+    { text: 'Configuration', icon: <SettingsIcon />, path: '/configuration' },
+    { text: 'About', icon: <InfoIcon />, path: '/about' },
   ];
 
   return (
@@ -51,6 +70,7 @@ const Navbar = ({ isLoggedIn, notifications }) => {
           bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
           boxShadow: 'none',
           borderBottom: 'none',
+          zIndex: 1300,
         }}
       >
         <Toolbar>
@@ -59,185 +79,116 @@ const Navbar = ({ isLoggedIn, notifications }) => {
             color="inherit"
             aria-label="menu"
             onClick={toggleDrawer}
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            variant="h6"
-            sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
-          >
+          <Typography variant="h6" sx={{ flexGrow: 1, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             FlatTopia
           </Typography>
-          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-            <TextField
-              placeholder="Search"
-              variant="outlined"
-              size="small"
+          <Box sx={{ flexGrow: 1 }}>
+            <Box
               sx={{
-                bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7', // Set background color based on theme
-                borderRadius: 1,
+                position: 'relative',
+                borderRadius: '4px',
+                backgroundColor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
+                marginRight: 2,
+                marginLeft: 0,
                 width: '100%',
-                maxWidth: '500px',
-                input: {
-                  color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-                },
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: 'transparent',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'transparent',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'transparent',
-                  },
-                },
+                display: 'flex',
+                alignItems: 'center',
               }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
+            >
+              <InputBase
+                placeholder="Buscar"
+                sx={{
+                  color: 'inherit',
+                  paddingLeft: '16px',
+                  flex: 1,
+                }}
+              />
+              <IconButton type="submit" sx={{ p: 1 }}>
+                <SearchIcon sx={{ color: 'inherit' }} />
+              </IconButton>
+            </Box>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton color="inherit" component={Link} to="/upload">
+            <IconButton color="inherit" component={Link} to="/upload" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
               <UploadIcon />
             </IconButton>
-            <IconButton color="inherit" component={Link} to="/notifications">
+            <IconButton color="inherit" component={Link} to="/notifications" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
               <Badge color="secondary" badgeContent={notifications}>
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <IconButton color="inherit" component={Link} to={isLoggedIn ? "/profile" : "/login"}>
+            <IconButton color="inherit" component={Link} to={isLoggedIn ? "/profile" : "/login"} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
               <PersonIcon />
             </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="permanent"
+        variant="persistent"
         open={drawerOpen}
         onClose={toggleDrawer}
         sx={{
-          width: drawerOpen ? 240 : 60,
+          display: drawerOpen ? 'block' : 'none',
+          width: 240,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: drawerOpen ? 240 : 60,
+            width: 240,
             boxSizing: 'border-box',
             bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
             color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-            overflowX: 'hidden',
-            paddingTop: '1.45vh',
+            boxShadow: 'none',
+            borderRight: 'none',
+            marginTop: '64px',
           },
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: drawerOpen ? 'flex-end' : 'center',
-            px: 2,
-            py: 1,
-          }}
-        >
-          <IconButton onClick={toggleDrawer} color="inherit">
-            <MenuIcon />
-          </IconButton>
-        </Box>
-        <Divider />
-        <Box
-          sx={{
-            overflow: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            height: '100%',
-          }}
-        >
+        <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
           <List>
             {menuItems.map((item) => (
-              <ListItem
-                button
-                key={item.text}
-                component={Link}
-                to={item.path}
-                sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
-              >
-                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ display: drawerOpen ? 'block' : 'none' }} />
+              <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
               </ListItem>
             ))}
           </List>
           <Divider />
           <List>
-            {drawerOpen && (
-              <>
-                <ListItem
-                  button
-                  onClick={toggleYou}
-                  sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
-                >
-                  <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                    <PersonIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="You" sx={{ display: drawerOpen ? 'block' : 'none' }} />
-                  {youOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </ListItem>
-                <Collapse in={youOpen && drawerOpen} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    {youItems.map((item) => (
-                      <ListItem
-                        button
-                        key={item.text}
-                        component={Link}
-                        to={item.path}
-                        sx={{
-                          color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-                          pl: 4,
-                        }}
-                      >
-                        <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                          {item.icon}
-                        </ListItemIcon>
-                        <ListItemText primary={item.text} />
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>
-              </>
-            )}
+            <ListItem button onClick={toggleYou} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+              <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                <PersonIcon />
+              </ListItemIcon>
+              <ListItemText primary="You" />
+              {youOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </ListItem>
+            <Collapse in={youOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {youItems.map((item) => (
+                  <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', pl: 4 }}>
+                    <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.text} />
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
           </List>
           <Divider />
           <List>
-            {menuItems.slice(2).map((item) => (
-              <ListItem
-                button
-                key={item.text}
-                component={Link}
-                to={item.path}
-                sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
-              >
-                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ display: drawerOpen ? 'block' : 'none' }} />
+            {settingsItems.map((item) => (
+              <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
               </ListItem>
             ))}
           </List>
-          <Box sx={{ textAlign: 'center', py: 2, display: drawerOpen ? 'block' : 'none' }}>
+          <Box sx={{ textAlign: 'center', py: 2 }}>
             <Typography variant="body2">&copy; 2024 FlatTopia</Typography>
           </Box>
         </Box>
       </Drawer>
-      <Box sx={{ mt: 8 }}> {/* Adjust the margin-top to account for the fixed AppBar */}
-        {/* Your main content goes here */}
-      </Box>
     </>
   );
 };
