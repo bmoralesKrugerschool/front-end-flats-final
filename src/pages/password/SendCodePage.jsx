@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Typography, Container, Box } from '@mui/material';
 
 const SendCodePage = () => {
     const [email, setEmail] = useState('');
@@ -19,19 +20,30 @@ const SendCodePage = () => {
     };
 
     return (
-        <div>
-            <h1>Enviar Código de Verificación</h1>
-            <form onSubmit={handleSubmit}>
-                <input
+        <Container maxWidth="sm" className="mt-10 p-4 bg-white rounded shadow">
+            <Box textAlign="center" mb={4}>
+                <Typography variant="h4">Enviar Código de Verificación</Typography>
+            </Box>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <TextField
+                    label="Correo Electrónico"
                     type="email"
-                    placeholder="Ingrese su correo electrónico"
+                    fullWidth
+                    variant="outlined"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <button type="submit">Enviar Código</button>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                >
+                    Enviar Código
+                </Button>
             </form>
-        </div>
+        </Container>
     );
 };
 
