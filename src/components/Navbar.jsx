@@ -36,7 +36,7 @@ import Logo from '../images/logo.svg';
 
 const Navbar = ({ isLoggedIn, notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [youOpen, setYouOpen] = useState(false);
+  const [youOpen, setYouOpen] = useState(true); // Por defecto, el botón "You" está desplegado
   const { themeMode } = useTheme();
 
   const toggleDrawer = () => {
@@ -77,29 +77,32 @@ const Navbar = ({ isLoggedIn, notifications }) => {
           zIndex: 1300,
         }}
       >
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={toggleDrawer}
-            sx={{ mr: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <img src={Logo} alt="FlatTopia Logo" style={{ height: '40px', marginRight: '8px' }} /> {/* Logo a la izquierda de FlatTopia */}
-          <Typography variant="h6" sx={{ flexGrow: 1, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-            FlatTopia
-          </Typography>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleDrawer}
+              sx={{ mr: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <img src={Logo} alt="FlatTopia Logo" style={{ height: '40px', marginRight: '8px' }} /> {/* Logo a la izquierda de FlatTopia */}
+            <Typography variant="h6" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+              FlatTopia
+            </Typography>
+          </Box>
           <Box
             sx={{
               position: 'relative',
               borderRadius: '4px',
               backgroundColor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
-              width: '100%',
               maxWidth: '600px', // Ajuste del ancho máximo de la barra de búsqueda
+              width: '100%',
               display: 'flex',
               alignItems: 'center',
+              mx: 'auto' // Centra la barra de búsqueda
             }}
           >
             <InputBase
@@ -125,7 +128,7 @@ const Navbar = ({ isLoggedIn, notifications }) => {
             </IconButton>
             <IconButton color="inherit" component={Link} to={isLoggedIn ? "/profile" : "/login"} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
               {isLoggedIn ? (
-                <Avatar alt="User Profile" src={userProfileImage} />
+                <Avatar alt="User Profile" src={userProfileImage} sx={{ border: '2px solid white' }} />
               ) : (
                 <PersonIcon />
               )}
