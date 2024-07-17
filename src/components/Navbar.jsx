@@ -14,7 +14,8 @@ import {
   Badge,
   CssBaseline,
   Collapse,
-  InputBase
+  InputBase,
+  Avatar
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -31,6 +32,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SearchIcon from '@mui/icons-material/Search';
 import { Link } from 'react-router-dom';
 import { useTheme } from './ThemeSwitcher';
+import Logo from '../images/logo.svg';
 
 const Navbar = ({ isLoggedIn, notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -61,6 +63,8 @@ const Navbar = ({ isLoggedIn, notifications }) => {
     { text: 'About', icon: <InfoIcon />, path: '/about' },
   ];
 
+  const userProfileImage = isLoggedIn ? '/path_to_user_image.jpg' : '/default_user_image.jpg'; // Rutas a las imágenes de perfil del usuario y por defecto
+
   return (
     <>
       <CssBaseline />
@@ -83,34 +87,32 @@ const Navbar = ({ isLoggedIn, notifications }) => {
           >
             <MenuIcon />
           </IconButton>
+          <img src={Logo} alt="FlatTopia Logo" style={{ height: '40px', marginRight: '8px' }} /> {/* Logo a la izquierda de FlatTopia */}
           <Typography variant="h6" sx={{ flexGrow: 1, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             FlatTopia
           </Typography>
-          <Box sx={{ flexGrow: 1 }}>
-            <Box
+          <Box
+            sx={{
+              position: 'relative',
+              borderRadius: '4px',
+              backgroundColor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
+              width: '100%',
+              maxWidth: '600px', // Ajuste del ancho máximo de la barra de búsqueda
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <InputBase
+              placeholder="Buscar"
               sx={{
-                position: 'relative',
-                borderRadius: '4px',
-                backgroundColor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
-                marginRight: 2,
-                marginLeft: 0,
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
+                color: 'inherit',
+                paddingLeft: '16px',
+                flex: 1,
               }}
-            >
-              <InputBase
-                placeholder="Buscar"
-                sx={{
-                  color: 'inherit',
-                  paddingLeft: '16px',
-                  flex: 1,
-                }}
-              />
-              <IconButton type="submit" sx={{ p: 1 }}>
-                <SearchIcon sx={{ color: 'inherit' }} />
-              </IconButton>
-            </Box>
+            />
+            <IconButton type="submit" sx={{ p: 1 }}>
+              <SearchIcon sx={{ color: 'inherit' }} />
+            </IconButton>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <IconButton color="inherit" component={Link} to="/upload" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
@@ -122,7 +124,11 @@ const Navbar = ({ isLoggedIn, notifications }) => {
               </Badge>
             </IconButton>
             <IconButton color="inherit" component={Link} to={isLoggedIn ? "/profile" : "/login"} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-              <PersonIcon />
+              {isLoggedIn ? (
+                <Avatar alt="User Profile" src={userProfileImage} />
+              ) : (
+                <PersonIcon />
+              )}
             </IconButton>
           </Box>
         </Toolbar>
