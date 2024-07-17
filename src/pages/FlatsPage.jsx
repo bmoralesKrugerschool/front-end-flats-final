@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from '../components/Navbar';
-import { getFlats } from '../servers/flats'; // Asegúrate de que la ruta de importación sea correcta
+import { getFlats } from '../servers/flats';
 
 const FlatsPage = () => {
   const [flats, setFlats] = useState([]);
@@ -18,15 +17,12 @@ const FlatsPage = () => {
 
   const fetchFlats = async () => {
     setLoading(true);
-    setError(null); // Reiniciar el estado de error antes de la nueva solicitud
+    setError(null);
     try {
       const data = await getFlats(city, minRentPrice, maxRentPrice, minAreaSize, maxAreaSize, page, limit, sortField, sortOrder);
-      console.log('data:', data);
-
-      if(data.code === 200) {
-        setFlats(data.data.flats || []); // Asegurar que flats sea un arreglo 
+      if (data.code === 200) {
+        setFlats(data.data.flats || []);
       }
-      
     } catch (error) {
       setError(error.message || 'Error fetching flats');
     } finally {
@@ -40,7 +36,7 @@ const FlatsPage = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setPage(1); // Reset to first page on new search
+    setPage(1);
     fetchFlats();
   };
 
@@ -56,7 +52,6 @@ const FlatsPage = () => {
     return <p>Error: {error}</p>;
   }
 
-  // Dividir flats en dos partes
   const topFlats = flats.slice(0, 5);
   const bottomFlats = flats.slice(5, 10);
 
@@ -147,25 +142,10 @@ const FlatsPage = () => {
               </div>
             ))}
           </div>
-          <div className="flex justify-between mt-4">
-            <button
-              className="bg-[#413c4e] text-[#FAF0E6] px-4 py-2 rounded-md"
-              onClick={() => setPage(prev => Math.max(prev - 1, 1))}
-              disabled={page === 1}
-            >
-              Previous
-            </button>
-            <button
-              className="bg-[#413c4e] text-[#FAF0E6] px-4 py-2 rounded-md"
-              onClick={() => setPage(prev => prev + 1)}
-            >
-              Next
-            </button>
-          </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default FlatsPage;

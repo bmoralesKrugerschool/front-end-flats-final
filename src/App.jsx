@@ -4,7 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import Flats from './pages/FlatsPages';
+import Flats from './pages/FlatsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import Navbar from './components/Navbar';
@@ -28,7 +28,7 @@ const AppContent = () => {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/profile" element={<ProtectedRoute><h1>Profile</h1></ProtectedRoute>} />
         <Route path="/about" element={<AboutPage />} />
-        <Route path="/flats" element={<ProtectedRoute><Flats /></ProtectedRoute>} />
+        <Route path="/myflats" element={<ProtectedRoute><Flats /></ProtectedRoute>} />
         <Route path="/flats/:id" element={<h1>Flat Details</h1>} />
         <Route path="/flats/:id/edit" element={<h1>Edit Flat</h1>} />
         <Route path="/flats/new" element={<h1>New Flat</h1>} />
