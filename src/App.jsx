@@ -15,17 +15,17 @@ import ResetPasswordPage from './pages/password/ResetPasswordPage';
 const AppContent = () => {
   const location = useLocation();
 
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register'|| location.pathname === '/send-code' ||location.pathname === '/reset-password';
+  const isAuthPage = ['/login', '/register', '/send-code', '/reset-password', '*'].includes(location.pathname);
 
   return (
     <>
       {!isAuthPage && <Navbar />}
       <Routes>
-        <Route path="/" element={<Flats/>} />
+        <Route path="/" element={<Flats />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/send-code" element={< SendCodePage/>} />
-        <Route path="/reset-password" element={< ResetPasswordPage/>} />
+        <Route path="/send-code" element={<SendCodePage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/profile" element={<ProtectedRoute><h1>Profile</h1></ProtectedRoute>} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/flats" element={<ProtectedRoute><Flats /></ProtectedRoute>} />
