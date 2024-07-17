@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText, ListItemIcon, Box, Divider, Badge, CssBaseline, Collapse } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText, ListItemIcon, Box, Divider, Badge, CssBaseline, Collapse, TextField, InputAdornment } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -10,6 +10,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import UploadIcon from '@mui/icons-material/Upload';
+import SearchIcon from '@mui/icons-material/Search';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from 'react-router-dom';
@@ -44,7 +45,14 @@ const Navbar = ({ isLoggedIn, notifications }) => {
   return (
     <>
       <CssBaseline />
-      <AppBar position="static" sx={{ bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
+      <AppBar
+        position="fixed"
+        sx={{
+          bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
+          boxShadow: 'none',
+          borderBottom: 'none',
+        }}
+      >
         <Toolbar>
           <IconButton
             edge="start"
@@ -55,9 +63,46 @@ const Navbar = ({ isLoggedIn, notifications }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+          <Typography
+            variant="h6"
+            sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
+          >
             FlatTopia
           </Typography>
+          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+            <TextField
+              placeholder="Search"
+              variant="outlined"
+              size="small"
+              sx={{
+                bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7', // Set background color based on theme
+                borderRadius: 1,
+                width: '100%',
+                maxWidth: '500px',
+                input: {
+                  color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'transparent',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'transparent',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'transparent',
+                  },
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <IconButton color="inherit" component={Link} to="/upload">
               <UploadIcon />
@@ -110,13 +155,21 @@ const Navbar = ({ isLoggedIn, notifications }) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            height: '100%'
+            height: '100%',
           }}
         >
           <List>
             {menuItems.map((item) => (
-              <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
+              <ListItem
+                button
+                key={item.text}
+                component={Link}
+                to={item.path}
+                sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
+              >
+                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                  {item.icon}
+                </ListItemIcon>
                 <ListItemText primary={item.text} sx={{ display: drawerOpen ? 'block' : 'none' }} />
               </ListItem>
             ))}
@@ -125,7 +178,11 @@ const Navbar = ({ isLoggedIn, notifications }) => {
           <List>
             {drawerOpen && (
               <>
-                <ListItem button onClick={toggleYou} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                <ListItem
+                  button
+                  onClick={toggleYou}
+                  sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
+                >
                   <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
                     <PersonIcon />
                   </ListItemIcon>
@@ -135,8 +192,19 @@ const Navbar = ({ isLoggedIn, notifications }) => {
                 <Collapse in={youOpen && drawerOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     {youItems.map((item) => (
-                      <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', pl: 4 }}>
-                        <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
+                      <ListItem
+                        button
+                        key={item.text}
+                        component={Link}
+                        to={item.path}
+                        sx={{
+                          color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
+                          pl: 4,
+                        }}
+                      >
+                        <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                          {item.icon}
+                        </ListItemIcon>
                         <ListItemText primary={item.text} />
                       </ListItem>
                     ))}
@@ -148,8 +216,16 @@ const Navbar = ({ isLoggedIn, notifications }) => {
           <Divider />
           <List>
             {menuItems.slice(2).map((item) => (
-              <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>{item.icon}</ListItemIcon>
+              <ListItem
+                button
+                key={item.text}
+                component={Link}
+                to={item.path}
+                sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
+              >
+                <ListItemIcon sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                  {item.icon}
+                </ListItemIcon>
                 <ListItemText primary={item.text} sx={{ display: drawerOpen ? 'block' : 'none' }} />
               </ListItem>
             ))}
@@ -159,6 +235,9 @@ const Navbar = ({ isLoggedIn, notifications }) => {
           </Box>
         </Box>
       </Drawer>
+      <Box sx={{ mt: 8 }}> {/* Adjust the margin-top to account for the fixed AppBar */}
+        {/* Your main content goes here */}
+      </Box>
     </>
   );
 };
