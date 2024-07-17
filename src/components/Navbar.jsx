@@ -33,10 +33,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Link } from 'react-router-dom';
 import { useTheme } from './ThemeSwitcher';
 import Logo from '../images/logo.svg';
+import DefaultUserPicture from '../images/DefaultUserPicture.svg';
 
 const Navbar = ({ isLoggedIn, notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [youOpen, setYouOpen] = useState(true); // Por defecto, el botón "You" está desplegado
+  const [youOpen, setYouOpen] = useState(true);
   const { themeMode } = useTheme();
 
   const toggleDrawer = () => {
@@ -63,7 +64,7 @@ const Navbar = ({ isLoggedIn, notifications }) => {
     { text: 'About', icon: <InfoIcon />, path: '/about' },
   ];
 
-  const userProfileImage = isLoggedIn ? '/path_to_user_image.jpg' : '/default_user_image.jpg'; // Rutas a las imágenes de perfil del usuario y por defecto
+  const userProfileImage = isLoggedIn ? '/path_to_user_image.jpg' : DefaultUserPicture;
 
   return (
     <>
@@ -149,8 +150,8 @@ const Navbar = ({ isLoggedIn, notifications }) => {
             boxSizing: 'border-box',
             bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
             color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-            boxShadow: 'none',
-            borderRight: 'none',
+            boxShadow: 'none', // Asegura que no haya sombra adicional
+            borderRight: 'none', // Asegura que no haya borde adicional
             marginTop: '64px',
           },
         }}
