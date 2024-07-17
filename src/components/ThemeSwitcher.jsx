@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { IconButton, Box, CssBaseline } from '@mui/material';
-import { Brightness4, Brightness7 } from '@mui/icons-material';
+import { Brightness4, Brightness7, Monitor } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const ThemeContext = createContext();
@@ -27,7 +27,9 @@ const ThemeSwitcher = ({ children }) => {
   }, []);
 
   const getIcon = () => {
-    return themeMode === 'light' ? <Brightness4 /> : <Brightness7 />;
+    if (themeMode === 'light') return <Brightness7 />;
+    if (themeMode === 'dark') return <Brightness4 />;
+    return <Monitor />;
   };
 
   const theme = createTheme({
@@ -49,7 +51,7 @@ const ThemeSwitcher = ({ children }) => {
       },
       secondary: {
         main: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-      }
+      },
     },
   });
 
