@@ -37,14 +37,12 @@ import DefaultUserPicture from '../images/DefaultUserPicture.svg';
 
 const Navbar = ({ isLoggedIn, notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [youOpen, setYouOpen] = useState(true); // Cambié esto a true para que por defecto esté abierto
+  const [youOpen, setYouOpen] = useState(true);
   const { themeMode } = useTheme();
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
-
-  // Función para abrir "You" y bloquearlo
   const openYou = () => {
     if (!drawerOpen) {
       setDrawerOpen(true);
@@ -56,18 +54,17 @@ const Navbar = ({ isLoggedIn, notifications }) => {
 
   const menuItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
-    { text: 'Filter', icon: <FilterListIcon />, path: '/filter' },
+    { text: 'Filter', icon: <FilterListIcon />, path: '/flats' },
   ];
 
   const youItems = [
     { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
     { text: 'Favorites', icon: <FavoriteIcon />, path: '/favorites' },
     { text: 'My Flats', icon: <ApartmentIcon />, path: '/myflats' },
-    { text: 'Create Flats', icon: <ApartmentIcon />, path: '/flats/new' },
   ];
 
   const settingsItems = [
-    { text: 'Configuration', icon: <SettingsIcon />, path: '/configuration' },
+    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
     { text: 'About', icon: <InfoIcon />, path: '/about' },
   ];
 
