@@ -56,13 +56,13 @@ const RegisterPage = () => {
     data.status = true;  // Set status to true by default
 
     try {
-      const response = await axios.post('http://localhost:3006/api/v1/user/register', data); // Asegúrate de que esta URL es correcta
+      const response = await axios.post('http://localhost:3006/api/v1/user/register', data);
 
       if (response.status === 200 || response.status === 201) {
         setBackendMessage('User created successfully!');
         setTimeout(() => {
-          navigate('/'); // Redirigir a la página principal después del registro exitoso
-        }, 2000); // Espera 2 segundos antes de redirigir
+          navigate('/'); // Redirect to the homepage after successful registration
+        }, 2000); // Wait for 2 seconds before redirecting
       }
     } catch (error) {
       if (error.response) {
@@ -84,7 +84,7 @@ const RegisterPage = () => {
       <Box sx={{
         display: 'flex',
         width: '98%',
-        height: '70vh', // Ajustar la altura según necesidad
+        height: '70vh', // Adjust height as needed
         borderRadius: '10px',
         overflow: 'hidden',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
@@ -215,21 +215,14 @@ const RegisterPage = () => {
                 <TextField
                   {...register('birthDate', {
                     required: 'Birthdate is required',
-                    validate: value => {
-                      const today = new Date();
-                      const birthDate = new Date(value);
-                      const age = today.getFullYear() - birthDate.getFullYear();
-                      if (today < new Date(birthDate.setFullYear(today.getFullYear()))) {
-                        return 'You must be at least 18 years old';
-                      }
-                      return age >= 18 || 'You must be at least 18 years old';
-                    }
                   })}
                   label="Birthdate"
-                  type="date"
                   fullWidth
                   variant="outlined"
-                  InputLabelProps={{ shrink: true }}
+                  type="date"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                   InputProps={{ startAdornment: <FaBirthdayCake /> }}
                   error={!!errors.birthDate}
                   helperText={errors.birthDate && errors.birthDate.message}
@@ -239,37 +232,34 @@ const RegisterPage = () => {
                 <TextField
                   {...register('role', { required: 'Role is required' })}
                   label="Role"
-                  select
                   fullWidth
                   variant="outlined"
+                  select
                   defaultValue="landlord"
-                  InputProps={{ startAdornment: <FaUser /> }}
                   error={!!errors.role}
                   helperText={errors.role && errors.role.message}
                 >
-                  <MenuItem value="admin">Admin</MenuItem>
                   <MenuItem value="landlord">Landlord</MenuItem>
                   <MenuItem value="renter">Renter</MenuItem>
+                  <MenuItem value="admin">Admin</MenuItem>
                 </TextField>
               </Grid>
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2, bgcolor: themeMode === 'dark' ? '#FAF0E6' : '#352F44', color: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}
-            >
+            {backendMessage && (
+              <Alert severity={backendMessage.includes('successfully') ? 'success' : 'error'} sx={{ mt: 2 }}>
+                {backendMessage}
+              </Alert>
+            )}
+            <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
               Register
             </Button>
           </form>
-          {backendMessage && (
-            <Alert severity="info" sx={{ mt: 2 }}>
-              {backendMessage}
-            </Alert>
-          )}
-          <Link href="/login" variant="body2" sx={{ mt: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-            Already have an account? Log in
-          </Link>
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            Already have an account?{' '}
+            <Link href="/login" underline="hover" color="inherit">
+              Log in
+            </Link>
+          </Typography>
         </Box>
       </Box>
     </Container>
