@@ -37,7 +37,7 @@ import DefaultUserPicture from '../images/DefaultUserPicture.svg';
 
 const Navbar = ({ isLoggedIn, notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [youOpen, setYouOpen] = useState(true);
+  const [youOpen, setYouOpen] = useState(true); // Mantener esto como estaba para controlar la expansión de "You"
   const { themeMode } = useTheme();
 
   const toggleDrawer = () => {
@@ -50,7 +50,7 @@ const Navbar = ({ isLoggedIn, notifications }) => {
 
   const menuItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
-    { text: 'Filter', icon: <FilterListIcon />, path: '/filter' },
+    { text: 'Filter', icon: <FilterListIcon />, path: '/search' },
   ];
 
   const youItems = [

@@ -12,6 +12,7 @@ import AboutPage from './pages/AboutPage';
 import SendCodePage from './pages/password/SendCodePage';
 import ResetPasswordPage from './pages/password/ResetPasswordPage';
 import NewFlatsPage from './pages/flats/newFlats/NewFlatsPage';
+import HomePage from './pages/HomePage';
 
 const AppContent = () => {
   const location = useLocation();
@@ -22,7 +23,8 @@ const AppContent = () => {
     <>
       {!isAuthPage && <Navbar />}
       <Routes>
-        <Route path="/" element={<Flats />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/search" element={<Flats />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/send-code" element={<SendCodePage />} />
