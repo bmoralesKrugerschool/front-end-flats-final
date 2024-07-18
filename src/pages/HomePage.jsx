@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Container } from '@mui/material';
+import { Box, Typography, Container, Grid, Button } from '@mui/material';
 import { FaArrowDown } from 'react-icons/fa';
 import { IoHomeOutline } from 'react-icons/io5';
 import FlatCard from '../components/FlatCard';
 import bannerImage from '../images/FlatTopiaBanner.png';
 
-const suggestedFlats = [
-  {
-    image: 'path-to-flat-image.jpg',
-    title: 'Departamento de Alquiler en Manta',
-    price: 650,
-    bedrooms: 2,
-    bathrooms: 1,
-    area: 141,
-    username: 'Username',
-    date: 'Published on 15/07/2024',
-  },
-  // Añade más flats según sea necesario
-];
-
 const HomePage = () => {
   const [showArrow, setShowArrow] = useState(true);
+  const [flats, setFlats] = useState([]);
+
+  const fetchRandomFlats = async () => {
+    try {
+      const response = await fetch('http://localhost:3006/api/v1/flats/getFlats?page=1&city=CUENCA&minRentPrice=66&maxRentPrice=888&minAreaSize=88&maxAreaSize=99&limit=12');
+      const data = await response.json();
+      setFlats(data.flats);
+    } catch (error) {
+      console.error('Error fetching random flats:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRandomFlats();
+  }, []);
 
   const handleScroll = () => {
     if (window.scrollY > 50) {
@@ -91,18 +92,68 @@ const HomePage = () => {
           </Box>
         )}
       </Box>
-      <Container>
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: 4, mb: 2 }}>
+      <Container sx={{ mt: 4, mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <IoHomeOutline style={{ fontSize: '2rem', marginRight: '0.5rem' }} />
           <Typography variant="h4" component="h2">
             Suggested Flats
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {suggestedFlats.map((flat, index) => (
-            <FlatCard key={index} {...flat} />
-          ))}
-        </Box>
+        <Grid container spacing={2}>
+          {flats.length > 0 ? (
+            flats.map((flat, index) => (
+              <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
+                <Box sx={{ position: 'relative' }}>
+                  <FlatCard
+                    image={flat.img || 'https://res.cloudinary.com/dv7hsw3kg/image/upload/v1629890099/avatars/avatar-1_ayx1tj.png'}
+                    title={`${flat.title} for ${flat.city} in ${flat.streetName}`}
+                    rentPrice={flat.rentPrice}
+                    bedrooms={flat.bedrooms}
+                    bathroom={flat.bathroom}
+                    areaSize={flat.areaSize}
+                    streetName={flat.streetName}
+                    streetNumber={flat.streetNumber}
+                    dateAvailable={flat.dateAvailable}
+                    hasAc={flat.hasAc}
+                    petsAllowed={flat.petsAllowed}
+                  />
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: 16,
+                      right: 16,
+                      opacity: 0,
+                      transition: 'opacity 0.3s ease',
+                      '&:hover': {
+                        opacity: 1,
+                      },
+                    }}
+                  >
+                    <Button variant="contained" color="primary">
+                      Join Now!
+                    </Button>
+                  </Box>
+                </Box>
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  p: 4,
+                  textAlign: 'center',
+                  bgcolor: 'background.paper',
+                  borderRadius: 2,
+                  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                <Typography variant="h6" color="text.secondary">
+                  No more flats available.
+                </Typography>
+              </Box>
+            </Grid>
+          )}
+        </Grid>
       </Container>
     </Container>
   );
