@@ -15,8 +15,7 @@ import {
   Collapse,
   InputBase,
   Avatar,
-  Button,
-  Badge
+  Button
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -27,13 +26,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import UploadIcon from '@mui/icons-material/Upload';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SearchIcon from '@mui/icons-material/Search';
 import { Link } from 'react-router-dom';
 import { useTheme } from './ThemeSwitcher';
-import { useAuth } from '../context/AuthContext';
 import Logo from '../images/logo.svg';
 import DefaultUserPicture from '../images/DefaultUserPicture.svg';
 
@@ -41,7 +39,6 @@ const Navbar = ({ notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [youOpen, setYouOpen] = useState(true);
   const { themeMode } = useTheme();
-  const { isAuthenticated, user } = useAuth();
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -125,38 +122,35 @@ const Navbar = ({ notifications }) => {
             </IconButton>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {isAuthenticated ? (
-              <>
-                <IconButton
-                  component={Link}
-                  to="/myflats/new"
-                  sx={{
-                    color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-                    ml: 2,
-                  }}
-                >
-                  <AddCircleIcon />
-                </IconButton>
-                <IconButton
-                  component={Link}
-                  to="/notifications"
-                  sx={{
-                    color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-                    ml: 2,
-                  }}
-                >
-                  <Badge badgeContent={notifications} color="error">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-                <Avatar alt="User Profile" src={user?.avatar || DefaultUserPicture} sx={{ ml: 1, border: '2px solid white' }} />
-              </>
-            ) : (
-              <Button color="inherit" component={Link} to="/login" sx={{ textTransform: 'none', color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                Log In
-                <Avatar alt="User Profile" src={DefaultUserPicture} sx={{ ml: 1, border: '2px solid white' }} />
-              </Button>
-            )}
+            <IconButton
+              color="inherit"
+              component={Link}
+              to="/myflats/new"
+              sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
+            >
+              <UploadIcon />
+            </IconButton>
+            <IconButton
+              color="inherit"
+              sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
+            >
+              <NotificationsIcon />
+              {notifications > 0 && (
+                <Badge
+                  badgeContent={notifications}
+                  color="error"
+                  sx={{ '& .MuiBadge-dot': { backgroundColor: themeMode === 'dark' ? '#FAF0E6' : '#352F44' } }}
+                />
+              )}
+            </IconButton>
+            <IconButton
+              color="inherit"
+              component={Link}
+              to="/profile"
+              sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
+            >
+              <Avatar alt="User Profile" src={DefaultUserPicture} sx={{ border: '2px solid white' }} />
+            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
