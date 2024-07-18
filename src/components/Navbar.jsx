@@ -57,6 +57,7 @@ const Navbar = ({ isLoggedIn, notifications }) => {
     { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
     { text: 'Favorites', icon: <FavoriteIcon />, path: '/favorites' },
     { text: 'My Flats', icon: <ApartmentIcon />, path: '/myflats' },
+    { text: 'Create Flats', icon: <ApartmentIcon />, path: '/flats/new' },
   ];
 
   const settingsItems = [

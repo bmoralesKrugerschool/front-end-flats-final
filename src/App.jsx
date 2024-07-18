@@ -11,6 +11,7 @@ import Navbar from './components/Navbar';
 import AboutPage from './pages/AboutPage';
 import SendCodePage from './pages/password/SendCodePage';
 import ResetPasswordPage from './pages/password/ResetPasswordPage';
+import NewFlatsPage from './pages/flats/newFlats/NewFlatsPage';
 
 const AppContent = () => {
   const location = useLocation();
@@ -27,12 +28,12 @@ const AppContent = () => {
         <Route path="/send-code" element={<SendCodePage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/profile" element={<ProtectedRoute><h1>Profile</h1></ProtectedRoute>} />
-        <Route path='/homepage' element={<ProtectedRoute><h1>Homepage</h1></ProtectedRoute>} />
+        <Route path='/homepage' element={<ProtectedRoute><h1>Homepage</h1></ProtectedRoute>} /> // pagina al iniciar sesion y al registrarse 
         <Route path="/about" element={<AboutPage />} />
         <Route path="/myflats" element={<ProtectedRoute><Flats /></ProtectedRoute>} />
         <Route path="/flats/:id" element={<h1>Flat Details</h1>} />
         <Route path="/flats/:id/edit" element={<h1>Edit Flat</h1>} />
-        <Route path="/flats/new" element={<h1>New Flat</h1>} />
+        <Route path="/flats/new" element={<ProtectedRoute><NewFlatsPage/></ProtectedRoute>} /> // crear un nuevo flat
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>

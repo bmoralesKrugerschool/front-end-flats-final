@@ -36,3 +36,5 @@ export const  getFlats = async (city, minRentPrice, maxRentPrice, minAreaSize, m
     return error.response.data;
   }
 }
+
+
