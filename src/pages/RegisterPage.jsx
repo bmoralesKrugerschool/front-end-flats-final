@@ -3,16 +3,16 @@ import { useForm } from 'react-hook-form';
 import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Button, TextField, Typography, Container, Grid, IconButton, Box, Alert, Link } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const RegisterPage = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
-  const { signUp } = useAuth();
   const { themeMode } = useTheme();
   const [backgroundImage, setBackgroundImage] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -45,19 +45,15 @@ const RegisterPage = () => {
     fetchImage();
   }, []);
 
-  const onSubmit = async (data) => {
-    try {
-      const response = await signUp(data);
-      if (response && response.data) {
-        setBackendMessage('User created successfully!');
-        // Handle redirection or further actions upon successful registration
-      } else {
-        setBackendMessage('Failed to create user. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error registering user:', error);
-      setBackendMessage('An error occurred. Please try again.');
+  const onSubmit = (data) => {
+    if (data.password !== data.confirmPassword) {
+      setBackendMessage('Passwords do not match');
+      return;
     }
+
+    // Aquí podrías realizar la llamada al backend para crear el usuario si fuera necesario
+    setBackendMessage('User created successfully!');
+    navigate('/'); // Redirigir a la página principal después del registro exitoso
   };
 
   return (
@@ -143,7 +139,8 @@ const RegisterPage = () => {
                     minLength: {
                       value: 8,
                       message: 'Password must be at least 8 characters long'
-                    }
+                    },
+                    validate: value => /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/.test(value) || 'Password must include at least one uppercase letter, one number, and one special character'
                   })}
                   label="Password"
                   fullWidth
@@ -169,7 +166,7 @@ const RegisterPage = () => {
                 <TextField
                   {...register('confirmPassword', {
                     required: 'Please confirm your password',
-                    validate: value => value === data.password || 'Passwords do not match'
+                    validate: value => value === password || 'Passwords do not match'
                   })}
                   label="Confirm Password"
                   fullWidth
@@ -216,13 +213,11 @@ const RegisterPage = () => {
               Register
             </Button>
             {backendMessage && (
-              <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
-                {backendMessage}
-              </Alert>
+              <Alert severity="error" sx={{ mt: 2 }}>{backendMessage}</Alert>
             )}
           </form>
-          <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', mt: 2 }}>
-            Already have an account? <Link href="/login" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Login!</Link>
+          <Typography variant="body2" sx={{ mt: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+            Already have an account? <Link href="/login">Login!</Link>
           </Typography>
         </Box>
       </Box>

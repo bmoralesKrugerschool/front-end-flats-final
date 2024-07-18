@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Typography, Container, Link, Snackbar } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../servers/auth';
 import MailIcon from '@mui/icons-material/Mail';
 import LockIcon from '@mui/icons-material/Lock';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const LoginPage = () => {
   const { themeMode } = useTheme();
-  const [backgroundImage, setBackgroundImage] = useState('');
+  const [backgroundImage, setBackgroundImage] = useState(''); // Definir backgroundImage en el estado local
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [backendMessage, setBackendMessage] = useState('');
-  const [showAlert, setShowAlert] = useState(false); // Estado para mostrar la alerta
+  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
-  const { signIn } = useAuth();
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -46,23 +45,23 @@ const LoginPage = () => {
     };
 
     fetchImage();
-  }, []);
+  }, []); // Empty dependency array to fetch image only once on component mount
 
   const onSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      setShowAlert(true); // Mostrar la alerta si los campos están vacíos
+      setShowAlert(true);
       return;
     }
 
     try {
       const data = { email, password };
-      const response = await signIn(data);
+      const response = await login(data); // Llamar a la función de login desde auth.js
 
-      if (response.code === 200) {
+      if (response.success) { // Revisa la estructura de tu respuesta desde el backend
         localStorage.setItem('token', response.token);
-        navigate('/flats');
+        navigate('/homepage');
       } else {
         setBackendMessage(response.message || 'An error occurred during login. Please try again.');
       }
@@ -81,7 +80,7 @@ const LoginPage = () => {
       <Box sx={{
         display: 'flex',
         width: '98%',
-        height: '70vh', // Altura ajustada según necesidades
+        height: '70vh',
         borderRadius: '10px',
         overflow: 'hidden',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
@@ -91,10 +90,10 @@ const LoginPage = () => {
         <Box sx={{
           width: '50%',
           height: '100%',
+          borderRadius: '10px 0 0 10px',
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          borderRadius: '10px 0 0 10px', // Bordes solo en la mitad izquierda
         }} />
 
         <Box sx={{
@@ -105,7 +104,7 @@ const LoginPage = () => {
           alignItems: 'center',
           justifyContent: 'center',
           p: 4,
-          borderRadius: '0 10px 10px 0', // Bordes solo en la mitad derecha
+          borderRadius: '0 10px 10px 0',
           bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
         }}>
           <Typography variant="h4" component="h1" sx={{ mb: 4, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
@@ -169,6 +168,13 @@ const LoginPage = () => {
           </Typography>
         </Box>
       </Box>
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        message="Please fill in both email and password fields."
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      />
     </Container>
   );
 };
