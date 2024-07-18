@@ -61,7 +61,7 @@ const RegisterPage = () => {
       if (response.status === 200 || response.status === 201) {
         setBackendMessage('User created successfully!');
         setTimeout(() => {
-          navigate('/homepage'); // Redirigir a la página principal después del registro exitoso
+          navigate('/'); // Redirigir a la página principal después del registro exitoso
         }, 2000); // Espera 2 segundos antes de redirigir
       }
     } catch (error) {
@@ -215,14 +215,21 @@ const RegisterPage = () => {
                 <TextField
                   {...register('birthDate', {
                     required: 'Birthdate is required',
+                    validate: value => {
+                      const today = new Date();
+                      const birthDate = new Date(value);
+                      const age = today.getFullYear() - birthDate.getFullYear();
+                      if (today < new Date(birthDate.setFullYear(today.getFullYear()))) {
+                        return 'You must be at least 18 years old';
+                      }
+                      return age >= 18 || 'You must be at least 18 years old';
+                    }
                   })}
                   label="Birthdate"
+                  type="date"
                   fullWidth
                   variant="outlined"
-                  type="date"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
+                  InputLabelProps={{ shrink: true }}
                   InputProps={{ startAdornment: <FaBirthdayCake /> }}
                   error={!!errors.birthDate}
                   helperText={errors.birthDate && errors.birthDate.message}
@@ -232,35 +239,37 @@ const RegisterPage = () => {
                 <TextField
                   {...register('role', { required: 'Role is required' })}
                   label="Role"
+                  select
                   fullWidth
                   variant="outlined"
-                  select
+                  defaultValue="landlord"
+                  InputProps={{ startAdornment: <FaUser /> }}
                   error={!!errors.role}
                   helperText={errors.role && errors.role.message}
                 >
+                  <MenuItem value="admin">Admin</MenuItem>
                   <MenuItem value="landlord">Landlord</MenuItem>
                   <MenuItem value="renter">Renter</MenuItem>
                 </TextField>
               </Grid>
-              {backendMessage && (
-                <Grid item xs={12}>
-                  <Alert severity={backendMessage.includes('successfully') ? 'success' : 'error'}>
-                    {backendMessage}
-                  </Alert>
-                </Grid>
-              )}
-              <Grid item xs={12}>
-                <Button type="submit" variant="contained" fullWidth>
-                  Register
-                </Button>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body2" align="center">
-                  Already have an account? <Link href="/login">Login</Link>
-                </Typography>
-              </Grid>
             </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2, bgcolor: themeMode === 'dark' ? '#FAF0E6' : '#352F44', color: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}
+            >
+              Register
+            </Button>
           </form>
+          {backendMessage && (
+            <Alert severity="info" sx={{ mt: 2 }}>
+              {backendMessage}
+            </Alert>
+          )}
+          <Link href="/login" variant="body2" sx={{ mt: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+            Already have an account? Log in
+          </Link>
         </Box>
       </Box>
     </Container>
