@@ -15,7 +15,8 @@ import {
   CssBaseline,
   Collapse,
   InputBase,
-  Avatar
+  Avatar,
+  Button
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -35,7 +36,7 @@ import { useTheme } from './ThemeSwitcher';
 import Logo from '../images/logo.svg';
 import DefaultUserPicture from '../images/DefaultUserPicture.svg';
 
-const Navbar = ({ isLoggedIn, notifications }) => {
+const Navbar = ({ notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [youOpen, setYouOpen] = useState(true);
   const { themeMode } = useTheme();
@@ -67,8 +68,6 @@ const Navbar = ({ isLoggedIn, notifications }) => {
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
     { text: 'About', icon: <InfoIcon />, path: '/about' },
   ];
-
-  const userProfileImage = isLoggedIn ? '/path_to_user_image.jpg' : DefaultUserPicture;
 
   return (
     <>
@@ -123,21 +122,10 @@ const Navbar = ({ isLoggedIn, notifications }) => {
             </IconButton>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton color="inherit" component={Link} to="/upload" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-              <UploadIcon />
-            </IconButton>
-            <IconButton color="inherit" component={Link} to="/notifications" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-              <Badge color="secondary" badgeContent={notifications}>
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <IconButton color="inherit" component={Link} to={isLoggedIn ? "/profile" : "/login"} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-              {isLoggedIn ? (
-                <Avatar alt="User Profile" src={userProfileImage} sx={{ border: '2px solid white' }} />
-              ) : (
-                <PersonIcon />
-              )}
-            </IconButton>
+            <Button color="inherit" component={Link} to="/login" sx={{ textTransform: 'none', color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+              Log In
+              <Avatar alt="User Profile" src={DefaultUserPicture} sx={{ ml: 1, border: '2px solid white' }} />
+            </Button>
           </Box>
         </Toolbar>
       </AppBar>
