@@ -13,6 +13,7 @@ import SendCodePage from './pages/password/SendCodePage';
 import ResetPasswordPage from './pages/password/ResetPasswordPage';
 import NewFlatsPage from './pages/flats/newFlats/NewFlatsPage';
 import HomePage from './pages/HomePage';
+import SettingsPage from './pages/SettingsPage';
 
 const AppContent = () => {
   const location = useLocation();
@@ -30,12 +31,12 @@ const AppContent = () => {
         <Route path="/send-code" element={<SendCodePage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/profile" element={<ProtectedRoute><h1>Profile</h1></ProtectedRoute>} />
-        <Route path='/homepage' element={<ProtectedRoute><h1>Homepage</h1></ProtectedRoute>} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/myflats" element={<ProtectedRoute><Flats /></ProtectedRoute>} />
         <Route path="/flats/:id" element={<h1>Flat Details</h1>} />
         <Route path="/flats/:id/edit" element={<h1>Edit Flat</h1>} />
         <Route path="/flats/new" element={<ProtectedRoute><NewFlatsPage/></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><SettingsPage/></ProtectedRoute>} /> {/* Agrega la ruta para SettingsPage */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
