@@ -77,70 +77,85 @@ const LoginPage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
+    <Container maxWidth="lg" sx={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
       <Box sx={{
         display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'stretch',
-        height: '50vh',
+        width: '98%',
+        height: '70vh', // Altura ajustada según necesidades
+        borderRadius: '10px',
+        overflow: 'hidden',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
+        color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
       }}>
         <Box sx={{
-          width: '60vh',
+          width: '50%',
+          height: '100%',
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          borderRadius: '10px 0 0 10px', // Bordes solo en la mitad izquierda
+        }} />
+
+        <Box sx={{
+          width: '50%',
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           p: 4,
-          borderRadius: '2px 0 0 2px',
+          borderRadius: '0 10px 10px 0', // Bordes solo en la mitad derecha
           bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
-          boxShadow: themeMode === 'dark' ? '0 4px 12px rgba(0, 0, 0, 0.5)' : '0 4px 12px rgba(0, 0, 0, 0.1)'
         }}>
           <Typography variant="h4" component="h1" sx={{ mb: 4, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             LOGIN
           </Typography>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            InputLabelProps={{
-              style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
-            }}
-            InputProps={{
-              style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' },
-              startAdornment: <MailIcon />
-            }}
-            sx={{ mb: 3 }}
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            InputLabelProps={{
-              style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
-            }}
-            InputProps={{
-              style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' },
-              startAdornment: <LockIcon />
-            }}
-            sx={{ mb: 3 }}
-          />
-          <Button
-            fullWidth
-            variant="contained"
-            sx={{
-              bgcolor: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-              color: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
-              mb: 2
-            }}
-            onClick={onSubmit}
-          >
-            LOGIN
-          </Button>
+          <form onSubmit={onSubmit} style={{ width: '100%' }}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              InputLabelProps={{
+                style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
+              }}
+              InputProps={{
+                style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' },
+                startAdornment: <MailIcon />
+              }}
+              sx={{ mb: 3 }}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              InputLabelProps={{
+                style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
+              }}
+              InputProps={{
+                style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' },
+                startAdornment: <LockIcon />
+              }}
+              sx={{ mb: 3 }}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                bgcolor: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
+                color: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
+                mb: 2
+              }}
+              fullWidth
+            >
+              LOGIN
+            </Button>
+          </form>
           {backendMessage && (
             <Typography variant="body2" sx={{ color: 'red', mb: 2 }}>
               {backendMessage}
@@ -153,23 +168,7 @@ const LoginPage = () => {
             Forgot your password? <Link href="/reset-password" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Reset Password!</Link>
           </Typography>
         </Box>
-        <Box sx={{
-          width: '60vh',
-          height: '100%',
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          borderRadius: '0 2px 2px 0',
-        }} />
       </Box>
-      {/* Snackbar para mostrar alerta de campos vacíos */}
-      <Snackbar
-        open={showAlert}
-        autoHideDuration={6000}
-        onClose={handleCloseAlert}
-        message="Please fill in both email and password fields."
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      />
     </Container>
   );
 };
