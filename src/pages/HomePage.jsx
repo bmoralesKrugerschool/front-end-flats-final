@@ -8,19 +8,33 @@ import bannerImage from '../images/FlatTopiaBanner.png';
 const HomePage = () => {
   const [showArrow, setShowArrow] = useState(true);
   const [flats, setFlats] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const fetchRandomFlats = async () => {
     try {
       const response = await fetch('http://localhost:3006/api/v1/flats/getFlats?page=1&city=CUENCA&minRentPrice=66&maxRentPrice=888&minAreaSize=88&maxAreaSize=99&limit=12');
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       const data = await response.json();
-      setFlats(data.flats);
+      setFlats(data.flats || []);
     } catch (error) {
-      console.error('Error fetching random flats:', error);
+      console.error('Error fetching random flats:', error.message);
+    }
+  };
+
+  const checkAuthStatus = () => {
+    const token = localStorage.getItem('token'); // o usa cookies según tu implementación
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
     }
   };
 
   useEffect(() => {
     fetchRandomFlats();
+    checkAuthStatus(); // Verifica el estado de autenticación al cargar la página
   }, []);
 
   const handleScroll = () => {
@@ -122,15 +136,15 @@ const HomePage = () => {
                       position: 'absolute',
                       bottom: 16,
                       right: 16,
-                      opacity: 0,
+                      opacity: isLoggedIn ? 1 : 0,
                       transition: 'opacity 0.3s ease',
                       '&:hover': {
                         opacity: 1,
                       },
                     }}
                   >
-                    <Button variant="contained" color="primary">
-                      Join Now!
+                    <Button variant="contained" color="primary" disabled={!isLoggedIn}>
+                      {isLoggedIn ? 'Join Now!' : 'Login to Join'}
                     </Button>
                   </Box>
                 </Box>

@@ -9,11 +9,13 @@ import axios from 'axios';
 
 const LoginPage = () => {
   const { themeMode } = useTheme();
-  const [backgroundImage, setBackgroundImage] = useState(''); // Definir backgroundImage en el estado local
+  const [backgroundImage, setBackgroundImage] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [backendMessage, setBackendMessage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,7 +35,7 @@ const LoginPage = () => {
         try {
           const alternativeResponse = await axios.get(pexelsUrl, {
             headers: {
-              Authorization: pexelsApiKey
+              Authorization: `Bearer ${pexelsApiKey}`
             }
           });
 
@@ -45,7 +47,7 @@ const LoginPage = () => {
     };
 
     fetchImage();
-  }, []); // Empty dependency array to fetch image only once on component mount
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -57,11 +59,14 @@ const LoginPage = () => {
 
     try {
       const data = { email, password };
-      const response = await login(data); // Llamar a la función de login desde auth.js
+      const response = await login(data);
 
-      if (response.success) { // Revisa la estructura de tu respuesta desde el backend
-        localStorage.setItem('token', response.token);
-        navigate('/homepage');
+      if (response.code === 200 && response.data) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        setSuccessMessage('Login successful!');
+        setOpenSuccessSnackbar(true);
+        setTimeout(() => navigate('/homepage'), 2000); // Redirect after 2 seconds
       } else {
         setBackendMessage(response.message || 'An error occurred during login. Please try again.');
       }
@@ -73,6 +78,10 @@ const LoginPage = () => {
 
   const handleCloseAlert = () => {
     setShowAlert(false);
+  };
+
+  const handleCloseSuccessSnackbar = () => {
+    setOpenSuccessSnackbar(false);
   };
 
   return (
@@ -173,6 +182,13 @@ const LoginPage = () => {
         autoHideDuration={6000}
         onClose={handleCloseAlert}
         message="Please fill in both email and password fields."
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      />
+      <Snackbar
+        open={openSuccessSnackbar}
+        autoHideDuration={2000}
+        onClose={handleCloseSuccessSnackbar}
+        message={successMessage}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       />
     </Container>
