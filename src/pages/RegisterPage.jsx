@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Button, TextField, Typography, Container, Grid, IconButton, Box, Alert, Link } from '@mui/material';
+import { Button, TextField, Typography, Container, Grid, IconButton, Box, Alert, Link, MenuItem } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const RegisterPage = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [backendMessage, setBackendMessage] = useState('');
   const { themeMode } = useTheme();
   const [backgroundImage, setBackgroundImage] = useState('');
   const navigate = useNavigate();
+
+  const password = watch('password');
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -45,15 +47,36 @@ const RegisterPage = () => {
     fetchImage();
   }, []);
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (data.password !== data.confirmPassword) {
       setBackendMessage('Passwords do not match');
       return;
     }
 
-    // Aquí podrías realizar la llamada al backend para crear el usuario si fuera necesario
-    setBackendMessage('User created successfully!');
-    navigate('/'); // Redirigir a la página principal después del registro exitoso
+    data.status = true;  // Set status to true by default
+
+    try {
+      const response = await axios.post('http://localhost:3006/api/v1/user/register', data); // Asegúrate de que esta URL es correcta
+
+      if (response.status === 200 || response.status === 201) {
+        setBackendMessage('User created successfully!');
+        setTimeout(() => {
+          navigate('/homepage'); // Redirigir a la página principal después del registro exitoso
+        }, 2000); // Espera 2 segundos antes de redirigir
+      }
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 404) {
+          setBackendMessage('Endpoint not found. Please check the URL.');
+        } else {
+          setBackendMessage(`An error occurred: ${error.response.data.message || 'Unknown error'}`);
+        }
+      } else if (error.request) {
+        setBackendMessage('No response from server. Please try again later.');
+      } else {
+        setBackendMessage(`An error occurred: ${error.message}`);
+      }
+    }
   };
 
   return (
@@ -197,28 +220,47 @@ const RegisterPage = () => {
                   fullWidth
                   variant="outlined"
                   type="date"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                   InputProps={{ startAdornment: <FaBirthdayCake /> }}
                   error={!!errors.birthDate}
                   helperText={errors.birthDate && errors.birthDate.message}
                 />
               </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  {...register('role', { required: 'Role is required' })}
+                  label="Role"
+                  fullWidth
+                  variant="outlined"
+                  select
+                  error={!!errors.role}
+                  helperText={errors.role && errors.role.message}
+                >
+                  <MenuItem value="landlord">Landlord</MenuItem>
+                  <MenuItem value="renter">Renter</MenuItem>
+                </TextField>
+              </Grid>
+              {backendMessage && (
+                <Grid item xs={12}>
+                  <Alert severity={backendMessage.includes('successfully') ? 'success' : 'error'}>
+                    {backendMessage}
+                  </Alert>
+                </Grid>
+              )}
+              <Grid item xs={12}>
+                <Button type="submit" variant="contained" fullWidth>
+                  Register
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="body2" align="center">
+                  Already have an account? <Link href="/login">Login</Link>
+                </Typography>
+              </Grid>
             </Grid>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Register
-            </Button>
-            {backendMessage && (
-              <Alert severity="error" sx={{ mt: 2 }}>{backendMessage}</Alert>
-            )}
           </form>
-          <Typography variant="body2" sx={{ mt: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-            Already have an account? <Link href="/login">Login!</Link>
-          </Typography>
         </Box>
       </Box>
     </Container>
