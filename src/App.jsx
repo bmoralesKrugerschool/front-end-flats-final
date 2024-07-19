@@ -14,6 +14,7 @@ import ResetPasswordPage from './pages/password/ResetPasswordPage';
 import NewFlatsPage from './pages/flats/newFlats/NewFlatsPage';
 import HomePage from './pages/HomePage';
 import SettingsPage from './pages/SettingsPage';
+import ProfilePage from './pages/ProfilePage';
 
 const AppContent = () => {
   const location = useLocation();
@@ -30,7 +31,7 @@ const AppContent = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/send-code" element={<SendCodePage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/profile" element={<ProtectedRoute><h1>Profile</h1></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage/></ProtectedRoute>} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/myflats" element={<ProtectedRoute><Flats /></ProtectedRoute>} />
         <Route path="/flats/:id" element={<h1>Flat Details</h1>} />
