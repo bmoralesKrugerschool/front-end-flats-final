@@ -1,26 +1,8 @@
-import React, { useState } from 'react';
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Box,
-  Divider,
-  CssBaseline,
-  Collapse,
-  InputBase,
-  Avatar,
-  Button
-} from '@mui/material';
+import React, { useContext, useState } from 'react';
+import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText, ListItemIcon, Box, Divider, CssBaseline, Collapse, Avatar, Badge, Popover } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import SettingsIcon from '@mui/icons-material/Settings';
 import InfoIcon from '@mui/icons-material/Info';
 import PersonIcon from '@mui/icons-material/Person';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -29,30 +11,41 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import UploadIcon from '@mui/icons-material/Upload';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import SearchIcon from '@mui/icons-material/Search';
-import { Link } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from './ThemeSwitcher';
+import { AuthContext } from '../context/AuthContext';
 import Logo from '../images/logo.svg';
 import DefaultUserPicture from '../images/DefaultUserPicture.svg';
 
 const Navbar = ({ notifications }) => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [youOpen, setYouOpen] = useState(true);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [youOpen, setYouOpen] = React.useState(true);
+  const [anchorEl, setAnchorEl] = useState(null);
   const { themeMode } = useTheme();
+  const { isAuthenticated, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
 
   const openYou = () => {
-    if (!drawerOpen) {
-      setDrawerOpen(true);
-      setYouOpen(true);
-    } else {
-      setYouOpen(!youOpen);
-    }
+    setYouOpen(!youOpen);
   };
 
+  const handleNotificationClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
+  // Items del menú para usuarios autenticados
   const menuItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
     { text: 'Filter', icon: <FilterListIcon />, path: '/flats' },
@@ -64,32 +57,18 @@ const Navbar = ({ notifications }) => {
     { text: 'My Flats', icon: <ApartmentIcon />, path: '/myflats' },
   ];
 
-  const settingsItems = [
-    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-    { text: 'About', icon: <InfoIcon />, path: '/about' },
+  // Items del menú para usuarios no autenticados
+  const guestMenuItems = [
+    { text: 'Home', icon: <HomeIcon />, path: '/' },
   ];
 
   return (
     <>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
-          boxShadow: 'none',
-          borderBottom: 'none',
-          zIndex: 1300,
-        }}
-      >
+      <AppBar position="fixed" sx={{ bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6', boxShadow: 'none', borderBottom: 'none', zIndex: 1300 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              onClick={toggleDrawer}
-              sx={{ mr: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
-            >
+            <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer} sx={{ mr: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
               <MenuIcon />
             </IconButton>
             <img src={Logo} alt="FlatTopia Logo" style={{ height: '40px', marginRight: '8px' }} />
@@ -97,60 +76,52 @@ const Navbar = ({ notifications }) => {
               FlatTopia
             </Typography>
           </Box>
-          <Box
-            sx={{
-              position: 'relative',
-              borderRadius: '4px',
-              backgroundColor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7',
-              maxWidth: '600px',
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              mx: 'auto'
-            }}
-          >
-            <InputBase
-              placeholder="Buscar"
-              sx={{
-                color: 'inherit',
-                paddingLeft: '16px',
-                flex: 1,
-              }}
-            />
-            <IconButton type="submit" sx={{ p: 1 }}>
-              <SearchIcon sx={{ color: 'inherit' }} />
-            </IconButton>
-          </Box>
+          <Typography variant="h6" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+            Welcome to FlatTopia!
+          </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton
-              color="inherit"
-              component={Link}
-              to="/myflats/new"
-              sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
-            >
-              <UploadIcon />
-            </IconButton>
-            <IconButton
-              color="inherit"
-              sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
-            >
-              <NotificationsIcon />
-              {notifications > 0 && (
-                <Badge
-                  badgeContent={notifications}
-                  color="error"
-                  sx={{ '& .MuiBadge-dot': { backgroundColor: themeMode === 'dark' ? '#FAF0E6' : '#352F44' } }}
-                />
-              )}
-            </IconButton>
-            <IconButton
-              color="inherit"
-              component={Link}
-              to="/profile"
-              sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}
-            >
-              <Avatar alt="User Profile" src={DefaultUserPicture} sx={{ border: '2px solid white' }} />
-            </IconButton>
+            {isAuthenticated ? (
+              <>
+                <IconButton color="inherit" component={Link} to="/myflats/new" sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                  <UploadIcon />
+                </IconButton>
+                <IconButton color="inherit" onClick={handleNotificationClick} sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                  <NotificationsIcon />
+                  {notifications > 0 && <Badge badgeContent={notifications} color="error" sx={{ '& .MuiBadge-dot': { backgroundColor: themeMode === 'dark' ? '#FAF0E6' : '#352F44' } }} />}
+                </IconButton>
+                <Popover
+                  id={id}
+                  open={open}
+                  anchorEl={anchorEl}
+                  onClose={handleNotificationClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                  }}
+                >
+                  <Box sx={{ p: 2, width: 300 }}>
+                    {notifications > 0 ? (
+                      <Typography variant="body2">You have {notifications} new notifications</Typography>
+                    ) : (
+                      <Typography variant="body2">No new notifications</Typography>
+                    )}
+                    {/* Aquí podrías mapear las notificaciones si tienes una lista */}
+                  </Box>
+                </Popover>
+                <IconButton color="inherit" component={Link} to="/profile" sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                  <Avatar alt="User Profile" src={DefaultUserPicture} sx={{ border: '2px solid white' }} />
+                </IconButton>
+              </>
+            ) : (
+              <IconButton color="inherit" component={Link} to="/login" sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                <PersonIcon />
+                <Typography variant="body2" sx={{ ml: 1 }}>Login</Typography>
+              </IconButton>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
@@ -167,52 +138,57 @@ const Navbar = ({ notifications }) => {
             color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
             boxShadow: 'none',
             borderRight: 'none',
+            height: 'calc(100vh - 64px)',
             marginTop: '64px',
             transition: 'width 0.3s ease-in-out',
+            overflowX: 'hidden',
           },
         }}
       >
-        <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
           <List sx={{ mt: 2 }}>
-            {menuItems.map((item) => (
+            {(isAuthenticated ? menuItems : guestMenuItems).map((item) => (
               <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 {drawerOpen && <ListItemText primary={item.text} />}
               </ListItem>
             ))}
           </List>
-          <Divider />
-          <List>
-            <ListItem button onClick={openYou} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', mt: 'auto', display: drawerOpen ? 'flex' : 'none' }}>
-              <ListItemIcon>
-                <PersonIcon />
-              </ListItemIcon>
-              <ListItemText primary="You" />
-              {youOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </ListItem>
-            <Collapse in={youOpen} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {youItems.map((item) => (
-                  <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', pl: 4, mb: 2, display: drawerOpen ? 'flex' : 'none' }}>
-                    <ListItemIcon>{item.icon}</ListItemIcon>
-                    <ListItemText primary={item.text} />
-                  </ListItem>
-                ))}
+          {isAuthenticated && (
+            <>
+              <Divider />
+              <List sx={{ mb: 2 }}>
+                <ListItem button onClick={openYou} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', display: drawerOpen ? 'flex' : 'none' }}>
+                  <ListItemIcon><PersonIcon /></ListItemIcon>
+                  <ListItemText primary="You" />
+                  {youOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </ListItem>
+                <Collapse in={youOpen} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {youItems.map((item) => (
+                      <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', pl: 4, mb: 2, display: drawerOpen ? 'flex' : 'none' }}>
+                        <ListItemIcon>{item.icon}</ListItemIcon>
+                        <ListItemText primary={item.text} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Collapse>
               </List>
-            </Collapse>
-          </List>
-          <Divider />
-          <List sx={{ mt: 'auto', mb: 2 }}>
-            {settingsItems.map((item) => (
-              <ListItem button key={item.text} component={Link} to={item.path} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                {drawerOpen && <ListItemText primary={item.text} />}
+              <Divider />
+            </>
+          )}
+          <List sx={{ mb: 2 }}>
+            <ListItem button component={Link} to="/about" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', display: 'flex' }}>
+              <ListItemIcon><InfoIcon /></ListItemIcon>
+              {drawerOpen && <ListItemText primary="About" />}
+            </ListItem>
+            {isAuthenticated && (
+              <ListItem button onClick={() => { logout(); navigate('/'); }} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', display: 'flex' }}>
+                <ListItemIcon><LogoutIcon /></ListItemIcon>
+                {drawerOpen && <ListItemText primary="Logout" />}
               </ListItem>
-            ))}
+            )}
           </List>
-          <Box sx={{ textAlign: 'center', py: 2 }}>
-            {drawerOpen && <Typography variant="body2">&copy;</Typography>}
-          </Box>
         </Box>
       </Drawer>
     </>

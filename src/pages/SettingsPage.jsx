@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Container, Box, Typography, Button, Alert } from '@mui/material';
+import { Container, Box, Typography, Button, Alert, Switch, FormControlLabel } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const SettingsPage = () => {
-  const { themeMode } = useTheme();
+  const { themeMode, toggleTheme } = useTheme(); // Assume you have a toggleTheme function in ThemeSwitcher
   const [logoutMessage, setLogoutMessage] = useState('');
+  const [notificationEnabled, setNotificationEnabled] = useState(true); // Example setting
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -16,8 +17,8 @@ const SettingsPage = () => {
       if (response.status === 200) {
         setLogoutMessage('Logout successful!');
         setTimeout(() => {
-          navigate('/login');
-        }, 2000); // Wait for 2 seconds before redirecting to login page
+          navigate('/');
+        }, 2000); // Wait for 2 seconds before redirecting to the main page
       }
     } catch (error) {
       if (error.response) {
@@ -28,6 +29,11 @@ const SettingsPage = () => {
         setLogoutMessage(`An error occurred: ${error.message}`);
       }
     }
+  };
+
+  const handleNotificationToggle = (event) => {
+    setNotificationEnabled(event.target.checked);
+    // You can add logic to save this setting to user profile or application state
   };
 
   return (
@@ -48,6 +54,11 @@ const SettingsPage = () => {
             {logoutMessage}
           </Alert>
         )}
+        <FormControlLabel
+          control={<Switch checked={notificationEnabled} onChange={handleNotificationToggle} />}
+          label="Enable Notifications"
+          sx={{ mb: 2 }}
+        />
         <Button variant="contained" fullWidth onClick={handleLogout}>
           Log Out
         </Button>
