@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -19,7 +19,11 @@ import ProfilePage from './pages/ProfilePage';
 const AppContent = () => {
   const location = useLocation();
 
-  const isAuthPage = ['/login', '/register', '/send-code', '/reset-password', '*'].includes(location.pathname);
+  const isAuthPage = ['/login', '/register', '/send-code', '/reset-password'].includes(location.pathname);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <>
@@ -31,13 +35,13 @@ const AppContent = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/send-code" element={<SendCodePage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/profile" element={<ProtectedRoute><ProfilePage/></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/myflats" element={<ProtectedRoute><Flats /></ProtectedRoute>} />
         <Route path="/flats/:id" element={<h1>Flat Details</h1>} />
         <Route path="/flats/:id/edit" element={<h1>Edit Flat</h1>} />
-        <Route path="/flats/new" element={<ProtectedRoute><NewFlatsPage/></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><SettingsPage/></ProtectedRoute>} /> {/* Agrega la ruta para SettingsPage */}
+        <Route path="/flats/new" element={<ProtectedRoute><NewFlatsPage /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
