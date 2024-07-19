@@ -10,6 +10,15 @@ const HomePage = () => {
   const [flats, setFlats] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Función para manejar la recarga de la página
+  const handlePageReload = () => {
+    const hasVisited = localStorage.getItem('hasVisitedHomePage');
+    if (!hasVisited) {
+      localStorage.setItem('hasVisitedHomePage', 'true');
+      window.location.reload();
+    }
+  };
+
   const fetchRandomFlats = async () => {
     try {
       const response = await fetch('http://localhost:3006/api/v1/flats/getFlats?page=1&city=CUENCA&minRentPrice=66&maxRentPrice=888&minAreaSize=88&maxAreaSize=99&limit=12');
@@ -33,8 +42,9 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    handlePageReload();
     fetchRandomFlats();
-    checkAuthStatus(); // Verifica el estado de autenticación al cargar la página
+    checkAuthStatus();
   }, []);
 
   const handleScroll = () => {

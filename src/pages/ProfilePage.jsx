@@ -1,115 +1,104 @@
-import React, { useState } from 'react';
-import { TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { Container, Box, Typography, TextField, Button, Avatar } from '@mui/material';
+import { useTheme } from '../components/ThemeSwitcher';
 import axios from 'axios';
+import VerificationCodeModal from '../components/VerificationCodeModal';
 
-const UpdateUserForm = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    role: '',
-    birthDate: '',
-    status: false,
-    photos: null,
-  });
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
+const ProfilePage = () => {
+    const { themeMode } = useTheme();
+    const { user, signUp } = useAuth();
+    const [formData, setFormData] = useState({
+        name: user?.name || '',
+        email: user?.email || '',
+        avatar: user?.avatar || ''
     });
-  };
+    const [isEditing, setIsEditing] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
 
-  const handleFileChange = (e) => {
-    setFormData({
-      ...formData,
-      photos: e.target.files[0],
-    });
-  };
+    useEffect(() => {
+        setFormData({
+            name: user?.name || '',
+            email: user?.email || '',
+            avatar: user?.avatar || ''
+        });
+    }, [user]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formDataToSend = new FormData();
-    Object.keys(formData).forEach((key) => {
-      formDataToSend.append(key, formData[key]);
-    });
+    const handleChange = (e) => {
+        const { name, value, files } = e.target;
+        if (name === 'avatar' && files.length > 0) {
+            const file = files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData({ ...formData, avatar: reader.result });
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
+    };
 
-    try {
-      const response = await axios.post('http://localhost:3006/api/v1/users/updateUser', formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error updating user:', error);
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await signUp(formData);
+        setIsEditing(false);
+    };
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <TextField
-            label="First Name"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Last Name"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Birth Date"
-            name="birthDate"
-            type="date"
-            value={formData.birthDate}
-            onChange={handleChange}
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.status}
-                onChange={handleChange}
-                name="status"
-              />
-            }
-            label="Status"
-          />
-          <input
-            type="file"
-            name="photos"
-            onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-full file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-violet-50 file:text-violet-700
-                      hover:file:bg-violet-100"
-          />
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            Update User
-          </Button>
-        </form>
-      </div>
-    </div>
-  );
+    const handleOpenModal = () => setOpenModal(true);
+    const handleCloseModal = () => setOpenModal(false);
+
+    return (
+        <Container maxWidth="sm" sx={{ bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
+            <Box sx={{ p: 4, bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7', borderRadius: 2, boxShadow: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                    <Avatar src={formData.avatar} sx={{ width: 100, height: 100, mr: 2 }} />
+                    {isEditing ? (
+                        <input type="file" name="avatar" accept="image/*" onChange={handleChange} />
+                    ) : (
+                        <Typography variant="h6" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                            User ID: {user?.id}
+                        </Typography>
+                    )}
+                </Box>
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        label="Name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        sx={{ mb: 3 }}
+                        disabled={!isEditing}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        label="Email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        sx={{ mb: 3 }}
+                        disabled={!isEditing}
+                    />
+                    {isEditing ? (
+                        <Button type="submit" variant="contained" color="primary" sx={{ mb: 3 }}>
+                            Save Changes
+                        </Button>
+                    ) : (
+                        <Button onClick={() => setIsEditing(true)} variant="contained" color="secondary" sx={{ mb: 3 }}>
+                            Edit Profile
+                        </Button>
+                    )}
+                </form>
+                <Button onClick={handleOpenModal} variant="outlined" color="error">
+                    Delete Account
+                </Button>
+            </Box>
+            <VerificationCodeModal open={openModal} onClose={handleCloseModal} />
+        </Container>
+    );
 };
 
-export default UpdateUserForm;
+export default ProfilePage;

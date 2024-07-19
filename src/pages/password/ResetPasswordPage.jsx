@@ -1,7 +1,8 @@
+// src/pages/ResetPasswordPage.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Typography, Container, Box } from '@mui/material';
+import { TextField, Button, Typography, Container, Box, Snackbar, Alert } from '@mui/material';
 import { useTheme } from '../../components/ThemeSwitcher';
 
 const ResetPasswordPage = () => {
@@ -11,6 +12,9 @@ const ResetPasswordPage = () => {
     const [newPassword, setNewPassword] = useState('');
     const [timeLeft, setTimeLeft] = useState(600);
     const [backgroundImage, setBackgroundImage] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('success'); // 'success' or 'error'
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -47,10 +51,20 @@ const ResetPasswordPage = () => {
         e.preventDefault();
         try {
             await axios.post('http://localhost:3006/api/v1/user/reset-password', { email, code, newPassword });
-            alert('Contraseña restablecida con éxito.');
-            navigate('/login');
+            setAlertMessage('Contraseña restablecida con éxito.');
+            setAlertSeverity('success');
+            setOpenSnackbar(true);
         } catch (error) {
-            alert('Error al restablecer la contraseña.');
+            setAlertMessage('Error al restablecer la contraseña.');
+            setAlertSeverity('error');
+            setOpenSnackbar(true);
+        }
+    };
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+        if (alertSeverity === 'success') {
+            navigate('/login');
         }
     };
 
@@ -159,6 +173,22 @@ const ResetPasswordPage = () => {
                     </form>
                 </Box>
             </Box>
+
+            {/* Snackbar para mostrar alertas */}
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                action={
+                    <Button color="inherit" onClick={handleCloseSnackbar}>
+                        Cerrar
+                    </Button>
+                }
+            >
+                <Alert onClose={handleCloseSnackbar} severity={alertSeverity} sx={{ width: '100%' }}>
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };

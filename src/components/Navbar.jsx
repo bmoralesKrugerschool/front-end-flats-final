@@ -1,5 +1,22 @@
 import React, { useContext, useState } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText, ListItemIcon, Box, Divider, CssBaseline, Collapse, Avatar, Badge, Popover } from '@mui/material';
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Box,
+  Divider,
+  Collapse,
+  Avatar,
+  Badge,
+  Popover,
+  CssBaseline,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -19,8 +36,8 @@ import Logo from '../images/logo.svg';
 import DefaultUserPicture from '../images/DefaultUserPicture.svg';
 
 const Navbar = ({ notifications }) => {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [youOpen, setYouOpen] = React.useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [youOpen, setYouOpen] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const { themeMode } = useTheme();
   const { isAuthenticated, logout } = useContext(AuthContext);
@@ -43,9 +60,9 @@ const Navbar = ({ notifications }) => {
   };
 
   const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
+  const id = open ? 'notification-popover' : undefined;
 
-  // Items del menú para usuarios autenticados
+  // Menu items
   const menuItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
     { text: 'Filter', icon: <FilterListIcon />, path: '/flats' },
@@ -57,7 +74,6 @@ const Navbar = ({ notifications }) => {
     { text: 'My Flats', icon: <ApartmentIcon />, path: '/myflats' },
   ];
 
-  // Items del menú para usuarios no autenticados
   const guestMenuItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
   ];
@@ -87,7 +103,9 @@ const Navbar = ({ notifications }) => {
                 </IconButton>
                 <IconButton color="inherit" onClick={handleNotificationClick} sx={{ ml: 2, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
                   <NotificationsIcon />
-                  {notifications > 0 && <Badge badgeContent={notifications} color="error" sx={{ '& .MuiBadge-dot': { backgroundColor: themeMode === 'dark' ? '#FAF0E6' : '#352F44' } }} />}
+                  {notifications > 0 && (
+                    <Badge badgeContent={notifications} color="error" sx={{ '& .MuiBadge-dot': { backgroundColor: themeMode === 'dark' ? '#FAF0E6' : '#352F44' } }} />
+                  )}
                 </IconButton>
                 <Popover
                   id={id}
@@ -178,14 +196,14 @@ const Navbar = ({ notifications }) => {
             </>
           )}
           <List sx={{ mb: 2 }}>
-            <ListItem button component={Link} to="/about" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', display: 'flex' }}>
+            <ListItem button component={Link} to="/about" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
               <ListItemIcon><InfoIcon /></ListItemIcon>
               {drawerOpen && <ListItemText primary="About" />}
             </ListItem>
             {isAuthenticated && (
-              <ListItem button onClick={() => { logout(); navigate('/'); }} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', display: 'flex' }}>
+              <ListItem button onClick={() => { logout(); navigate('/'); }} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
                 <ListItemIcon><LogoutIcon /></ListItemIcon>
-                {drawerOpen && <ListItemText primary="Logout" />}
+                {drawerOpen && <ListItemText primary="Log Out" />}
               </ListItem>
             )}
           </List>

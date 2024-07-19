@@ -1,6 +1,7 @@
 import React from 'react';
-import { Card, CardMedia, CardContent, Typography, Box } from '@mui/material';
-import { FaBed, FaBath, FaCar } from 'react-icons/fa';
+import PropTypes from 'prop-types';
+import { Card, CardContent, CardMedia, Typography, Box, Tooltip } from '@mui/material';
+import { FaBed, FaBath, FaArrowsAltH } from 'react-icons/fa';
 
 const FlatCard = ({
   image,
@@ -16,68 +17,61 @@ const FlatCard = ({
   petsAllowed
 }) => {
   return (
-    <Card
-      sx={{
-        maxWidth: 345,
-        bgcolor: 'background.paper',
-        m: 2,
-        borderRadius: 12,
-        boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.15)',
-        overflow: 'hidden',
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-        '&:hover': {
-          transform: 'scale(1.05)',
-          boxShadow: '0px 12px 24px rgba(0, 0, 0, 0.2)',
-        },
-      }}
-    >
-      <CardMedia
-        component="img"
-        height="200"
-        image={image || 'https://res.cloudinary.com/dv7hsw3kg/image/upload/v1629890099/avatars/avatar-1_ayx1tj.png'}
-        alt={title}
-        sx={{
-          objectFit: 'cover',
-          borderBottom: '1px solid #ddd',
-        }}
-      />
+    <Card sx={{ maxWidth: 345, margin: 2 }}>
+      {image && <CardMedia component="img" height="140" image={image} alt={title} />}
       <CardContent>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+        <Typography gutterBottom variant="h5" component="div">
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          {streetName} {streetNumber}
+        <Typography variant="h6" color="text.primary" sx={{ mb: 1 }}>
+          ${rentPrice}
         </Typography>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-          <Typography variant="h6" color="#8CABFF">
-            ${rentPrice}
-          </Typography>
-          <Box display="flex" alignItems="center">
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          <Tooltip title={`Bedrooms: ${bedrooms}`}>
             <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
               <FaBed style={{ marginRight: '0.5rem' }} /> {bedrooms}
             </Typography>
+          </Tooltip>
+          <Tooltip title={`Bathrooms: ${bathroom}`}>
             <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
               <FaBath style={{ marginRight: '0.5rem' }} /> {bathroom}
             </Typography>
+          </Tooltip>
+          <Tooltip title={`Area: ${areaSize} sq ft`}>
             <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
-              <FaCar style={{ marginRight: '0.5rem' }} /> {areaSize} m²
+              <FaArrowsAltH style={{ marginRight: '0.5rem' }} /> {areaSize}
             </Typography>
-          </Box>
-        </Box>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-          <Typography variant="body2" color="text.secondary">
-            {hasAc ? 'AC Included' : 'No AC'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Available: {new Date(dateAvailable).toLocaleDateString()}
-          </Typography>
+          </Tooltip>
         </Box>
         <Typography variant="body2" color="text.secondary">
-          Pets Allowed: {petsAllowed ? 'Yes' : 'No'}
+          {streetName}, {streetNumber}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Available: {new Date(dateAvailable).toLocaleDateString()}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {hasAc ? 'AC Available' : 'No AC'}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {petsAllowed ? 'Pets Allowed' : 'No Pets'}
         </Typography>
       </CardContent>
     </Card>
   );
+};
+
+FlatCard.propTypes = {
+  image: PropTypes.string,
+  title: PropTypes.string.isRequired,
+  rentPrice: PropTypes.number.isRequired,
+  bedrooms: PropTypes.number.isRequired,
+  bathroom: PropTypes.number.isRequired,
+  areaSize: PropTypes.number.isRequired,
+  streetName: PropTypes.string.isRequired,
+  streetNumber: PropTypes.string.isRequired,
+  dateAvailable: PropTypes.string.isRequired,
+  hasAc: PropTypes.bool.isRequired,
+  petsAllowed: PropTypes.bool.isRequired,
 };
 
 export default FlatCard;
