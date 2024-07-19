@@ -58,15 +58,14 @@ const LoginPage = () => {
     }
 
     try {
-      const data = { email, password };
-      const response = await login(data);
+      const response = await login({ email, password });
 
       if (response.code === 200 && response.data) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         setSuccessMessage('Login successful!');
         setOpenSuccessSnackbar(true);
-        setTimeout(() => navigate('/homepage'), 2000); // Redirect after 2 seconds
+        setTimeout(() => navigate('/'), 2000); // Redirect after 2 seconds
       } else {
         setBackendMessage(response.message || 'An error occurred during login. Please try again.');
       }
