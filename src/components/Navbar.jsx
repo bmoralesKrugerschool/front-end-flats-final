@@ -65,7 +65,7 @@ const Navbar = ({ notifications }) => {
   // Menu items
   const menuItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
-    { text: 'Filter', icon: <FilterListIcon />, path: '/flats' },
+    { text: 'Search', icon: <FilterListIcon />, path: '/search' },
   ];
 
   const youItems = [
