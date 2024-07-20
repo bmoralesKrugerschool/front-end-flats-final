@@ -10,7 +10,6 @@ const HomePage = () => {
   const [flats, setFlats] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Función para manejar la recarga de la página
   const handlePageReload = () => {
     const hasVisited = localStorage.getItem('hasVisitedHomePage');
     if (!hasVisited) {
@@ -33,7 +32,7 @@ const HomePage = () => {
   };
 
   const checkAuthStatus = () => {
-    const token = localStorage.getItem('token'); // o usa cookies según tu implementación
+    const token = localStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true);
     } else {
@@ -64,7 +63,7 @@ const HomePage = () => {
 
   return (
     <Container maxWidth={false} disableGutters>
-      <Box sx={{ width: '100%', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+      <Box sx={{ width: '100%', height: { xs: '50vh', md: '100vh' }, position: 'relative', overflow: 'hidden' }}>
         <Box
           component="img"
           src={bannerImage}
@@ -116,9 +115,9 @@ const HomePage = () => {
           </Box>
         )}
       </Box>
-      <Container sx={{ mt: 4, mb: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <IoHomeOutline style={{ fontSize: '2rem', marginRight: '0.5rem' }} />
+      <Container sx={{ mt: 4, mb: 2, px: { xs: 2, sm: 3, md: 4 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, flexDirection: { xs: 'column', sm: 'row' }, textAlign: { xs: 'center', sm: 'left' } }}>
+          <IoHomeOutline style={{ fontSize: '2rem', marginRight: { xs: 0, sm: '0.5rem' }, marginBottom: { xs: '0.5rem', sm: 0 } }} />
           <Typography variant="h4" component="h2">
             Suggested Flats
           </Typography>

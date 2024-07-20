@@ -16,6 +16,8 @@ import {
   Badge,
   Popover,
   CssBaseline,
+  useMediaQuery,
+  useTheme as useMuiTheme,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -42,6 +44,9 @@ const Navbar = ({ notifications }) => {
   const { themeMode } = useTheme();
   const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const muiTheme = useMuiTheme();
+  const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down('sm'));
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -92,9 +97,11 @@ const Navbar = ({ notifications }) => {
               FlatTopia
             </Typography>
           </Box>
-          <Typography variant="h6" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-            Welcome to FlatTopia!
-          </Typography>
+          {!isSmallScreen && (
+            <Typography variant="h6" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+              Welcome to FlatTopia!
+            </Typography>
+          )}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {isAuthenticated ? (
               <>
@@ -191,22 +198,16 @@ const Navbar = ({ notifications }) => {
                     ))}
                   </List>
                 </Collapse>
+                <ListItem button onClick={() => {
+                  logout();
+                  navigate('/');
+                }} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                  <ListItemIcon><LogoutIcon /></ListItemIcon>
+                  <ListItemText primary="Log Out" />
+                </ListItem>
               </List>
-              <Divider />
             </>
           )}
-          <List sx={{ mb: 2 }}>
-            <ListItem button component={Link} to="/about" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-              <ListItemIcon><InfoIcon /></ListItemIcon>
-              {drawerOpen && <ListItemText primary="About" />}
-            </ListItem>
-            {isAuthenticated && (
-              <ListItem button onClick={() => { logout(); navigate('/'); }} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                <ListItemIcon><LogoutIcon /></ListItemIcon>
-                {drawerOpen && <ListItemText primary="Log Out" />}
-              </ListItem>
-            )}
-          </List>
         </Box>
       </Drawer>
     </>
