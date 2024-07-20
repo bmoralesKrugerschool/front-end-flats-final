@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Container, Box, Typography, TextField, Button, Avatar, Link } from '@mui/material';
+import { Container, Box, Typography, TextField, Button, Avatar, Link, Grid, MenuItem, Select, InputLabel } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
 import VerificationCodeModal from '../components/VerificationCodeModal';
 
@@ -8,21 +8,27 @@ const ProfilePage = () => {
     const { themeMode } = useTheme();
     const { user, signUp } = useAuth();
     const [formData, setFormData] = useState({
-        name: user?.name || '',
-        email: user?.email || '',
-        avatar: user?.avatar || '',
-        role: user?.role || '' // Añadido el campo de rol
+        name: '',
+        lastName: '',
+        email: '',
+        password: '',
+        birthDate: '',
+        role: '',
     });
     const [isEditing, setIsEditing] = useState(false);
     const [openModal, setOpenModal] = useState(false);
 
     useEffect(() => {
-        setFormData({
-            name: user?.name || '',
-            email: user?.email || '',
-            avatar: user?.avatar || '',
-            role: user?.role || ''
-        });
+        if (user) {
+            setFormData({
+                name: user.name || '',
+                lastName: user.lastName || '',
+                email: user.email || '',
+                password: '', // No deberías mostrar la contraseña en el perfil
+                birthDate: user.birthDate || '',
+                role: user.role || '',
+            });
+        }
     }, [user]);
 
     const handleChange = (e) => {
@@ -41,8 +47,17 @@ const ProfilePage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await signUp(formData);
-        setIsEditing(false);
+        // Validación simple
+        if (!formData.name || !formData.lastName || !formData.email || !formData.password || !formData.birthDate || !formData.role) {
+            alert('Please fill out all required fields.');
+            return;
+        }
+        try {
+            await signUp(formData);
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+        }
     };
 
     const handleOpenModal = () => setOpenModal(true);
@@ -68,33 +83,88 @@ const ProfilePage = () => {
                     )}
                 </Box>
                 <form onSubmit={handleSubmit}>
-                    <TextField
-                        fullWidth
-                        variant="outlined"
-                        label="Name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        sx={{ mb: 3 }}
-                        disabled={!isEditing}
-                    />
-                    <TextField
-                        fullWidth
-                        variant="outlined"
-                        label="Email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        sx={{ mb: 3 }}
-                        disabled={!isEditing}
-                    />
-                    {/* Campo de rol solo visible para administradores */}
-                    {user?.role === 'admin' && !isEditing && (
-                        <Typography variant="body1" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', mb: 3 }}>
-                            Role: {formData.role}
-                        </Typography>
-                    )}
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                label="First Name"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                sx={{ mb: 3 }}
+                                disabled={!isEditing}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                label="Last Name"
+                                name="lastName"
+                                value={formData.lastName}
+                                onChange={handleChange}
+                                sx={{ mb: 3 }}
+                                disabled={!isEditing}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                label="Email"
+                                name="email"
+                                type="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                sx={{ mb: 3 }}
+                                disabled={!isEditing}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                label="Password"
+                                name="password"
+                                type="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                sx={{ mb: 3 }}
+                                disabled={!isEditing}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                label="Birth Date"
+                                name="birthDate"
+                                type="date"
+                                value={formData.birthDate}
+                                onChange={handleChange}
+                                sx={{ mb: 3 }}
+                                InputLabelProps={{ shrink: true }}
+                                disabled={!isEditing}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <InputLabel>Role</InputLabel>
+                            <Select
+                                fullWidth
+                                variant="outlined"
+                                name="role"
+                                value={formData.role}
+                                onChange={handleChange}
+                                sx={{ mb: 3 }}
+                                disabled={!isEditing}
+                            >
+                                <MenuItem value="admin">Admin</MenuItem>
+                                <MenuItem value="landlord">Landlord</MenuItem>
+                                <MenuItem value="renter">Renter</MenuItem>
+                            </Select>
+                        </Grid>
+                    </Grid>
                     {isEditing ? (
                         <Button type="submit" variant="contained" color="primary" sx={{ mb: 3 }}>
                             Save Changes
@@ -105,7 +175,6 @@ const ProfilePage = () => {
                         </Button>
                     )}
                 </form>
-                {/* Enlace al panel de administrador visible solo para administradores */}
                 {user?.role === 'admin' && (
                     <Link href="/admin" variant="body2" sx={{ display: 'block', mb: 3, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
                         Go to Admin Panel
