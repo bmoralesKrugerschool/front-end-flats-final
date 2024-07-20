@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Container, Box, Typography, TextField, Button, Avatar } from '@mui/material';
+import { Container, Box, Typography, TextField, Button, Avatar, Link } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
-import axios from 'axios';
 import VerificationCodeModal from '../components/VerificationCodeModal';
 
 const ProfilePage = () => {
@@ -11,7 +10,8 @@ const ProfilePage = () => {
     const [formData, setFormData] = useState({
         name: user?.name || '',
         email: user?.email || '',
-        avatar: user?.avatar || ''
+        avatar: user?.avatar || '',
+        role: user?.role || '' // Añadido el campo de rol
     });
     const [isEditing, setIsEditing] = useState(false);
     const [openModal, setOpenModal] = useState(false);
@@ -20,7 +20,8 @@ const ProfilePage = () => {
         setFormData({
             name: user?.name || '',
             email: user?.email || '',
-            avatar: user?.avatar || ''
+            avatar: user?.avatar || '',
+            role: user?.role || ''
         });
     }, [user]);
 
@@ -48,8 +49,14 @@ const ProfilePage = () => {
     const handleCloseModal = () => setOpenModal(false);
 
     return (
-        <Container maxWidth="sm" sx={{ bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
-            <Box sx={{ p: 4, bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7', borderRadius: 2, boxShadow: 3 }}>
+        <Container maxWidth="sm" sx={{ 
+            bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh'
+        }}>
+            <Box sx={{ p: 4, bgcolor: themeMode === 'dark' ? '#5C5470' : '#B9B4C7', borderRadius: 2, boxShadow: 3, width: '100%', maxWidth: '600px' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <Avatar src={formData.avatar} sx={{ width: 100, height: 100, mr: 2 }} />
                     {isEditing ? (
@@ -82,6 +89,12 @@ const ProfilePage = () => {
                         sx={{ mb: 3 }}
                         disabled={!isEditing}
                     />
+                    {/* Campo de rol solo visible para administradores */}
+                    {user?.role === 'admin' && !isEditing && (
+                        <Typography variant="body1" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', mb: 3 }}>
+                            Role: {formData.role}
+                        </Typography>
+                    )}
                     {isEditing ? (
                         <Button type="submit" variant="contained" color="primary" sx={{ mb: 3 }}>
                             Save Changes
@@ -92,6 +105,12 @@ const ProfilePage = () => {
                         </Button>
                     )}
                 </form>
+                {/* Enlace al panel de administrador visible solo para administradores */}
+                {user?.role === 'admin' && (
+                    <Link href="/admin" variant="body2" sx={{ display: 'block', mb: 3, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+                        Go to Admin Panel
+                    </Link>
+                )}
                 <Button onClick={handleOpenModal} variant="outlined" color="error">
                     Delete Account
                 </Button>
