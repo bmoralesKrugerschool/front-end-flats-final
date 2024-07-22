@@ -2,6 +2,11 @@ import axios from 'axios';
 
 const Api = 'http://localhost:3006/api/v1/user/';
 
+/**
+ * REGISTRO DE USUARIO
+ * @param {*} data 
+ * @returns 
+ */
 export const register = async (data) => {
   console.log('data:', data);
   data.status = true
@@ -14,6 +19,11 @@ export const register = async (data) => {
   }
 }
 
+/**
+ * LOGIN DE USUARIO
+ *  @param {*} data
+ * @returns 
+ */
 export const login = async (data) => {
   console.log('data:', data);
   data.status = true
@@ -26,6 +36,11 @@ export const login = async (data) => {
   }
 }
 
+/**
+ * LOGOUT DE USUARIO
+ * @param {*} data
+ * @returns 
+ */
 export const logout = async (data) => {
   data.status = true
   try {
@@ -35,6 +50,8 @@ export const logout = async (data) => {
     return error.response.data;
   }
 }
+
+
 
 export const getSuggestedFlats = async () => {
   try {

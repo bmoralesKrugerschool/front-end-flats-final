@@ -30,10 +30,10 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTheme } from './ThemeSwitcher';
-import { AuthContext } from '../context/AuthContext';
-import Logo from '../images/logo.svg';
-import DefaultUserPicture from '../images/DefaultUserPicture.svg';
+import { useTheme } from '../ThemeSwitcher';
+import { AuthContext } from '../../context/AuthContext';
+import Logo from '../../images/logo.svg';
+import DefaultUserPicture from '../../images/DefaultUserPicture.svg';
 
 const Navbar = ({ notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);

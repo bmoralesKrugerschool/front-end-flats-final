@@ -7,13 +7,13 @@ import RegisterPage from './pages/RegisterPage';
 import FlatsPage from './pages/FlatsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ThemeSwitcher from './components/ThemeSwitcher';
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbar/Navbar';
 import AboutPage from './pages/AboutPage';
 import SendCodePage from './pages/password/SendCodePage';
 import ResetPasswordPage from './pages/password/ResetPasswordPage';
 import NewFlatsPage from './pages/flats/newFlats/NewFlatsPage';
 import HomePage from './pages/HomePage';
-import SettingsPage from './pages/SettingsPage';
+//import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPanel from './pages/AdminPanel';
 
@@ -42,7 +42,7 @@ const AppContent = () => {
         <Route path="/flats/:id" element={<h1>Flat Details</h1>} />
         <Route path="/flats/:id/edit" element={<h1>Edit Flat</h1>} />
         <Route path="/flats/new" element={<ProtectedRoute><NewFlatsPage /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+        {/* <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} /> */}
         <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminPanel /></ProtectedRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

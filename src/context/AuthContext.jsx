@@ -42,11 +42,17 @@ export const AuthProvider = ({ children }) => {
     const res = await register(userData); //res.data
     console.log('res:', res); //res.data
     if (res.code !== 201 || !res.data) {
+      console.log('res:', res);
       return res;
     }
+    console.log('res:', res);
+    console.log('res:', res.data.user.firstName);
+    console.log('res:', res.data.user);
+ 
+    let avatarA = getInitialsAvatar(res.data.user.firstName);
     const userWithAvatar = {
       ...res.data,
-      avatar: getInitialsAvatar(res.data.user.name)
+      avatar: avatarA
     };
     console.log('userWithAvatar:', userWithAvatar);
     
@@ -68,7 +74,7 @@ export const AuthProvider = ({ children }) => {
 
     const userWithAvatar = {
       ...res.data,
-      avatar: getInitialsAvatar(res.data.user.name)
+      avatar: getInitialsAvatar(res.data.user.firstName)
     };
     console.log('userWithAvatar:', userWithAvatar);
     
@@ -85,15 +91,20 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  const getInitialsAvatar = (name) => {
-    console.log('name:', name);
-    const initials = name.split(' ').map(n => n[0]).join('');
+  const getInitialsAvatar = (firstName) => {
+    console.log('firstName:', firstName);
+    const initials = firstName.split(' ').map(n => n[0]).join('');
     console.log('initials:', initials);
     return `${initials[0]}`;
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, logout, user, signUp, signIn }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated,
+      logout, 
+      user, 
+      signUp, 
+      signIn }}>
       {children}
     </AuthContext.Provider>
   );

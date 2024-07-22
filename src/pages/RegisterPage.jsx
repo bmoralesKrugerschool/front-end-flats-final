@@ -4,6 +4,7 @@ import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'r
 import { Button, TextField, Typography, Container, Grid, IconButton, Box, Alert, Link, MenuItem } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
 const RegisterPage = () => {
@@ -13,7 +14,9 @@ const RegisterPage = () => {
   const { themeMode } = useTheme();
   const [backgroundImage, setBackgroundImage] = useState('');
   const navigate = useNavigate();
+  const { signUp, user } = useAuth();
 
+  console.log('user:', user);
   const password = watch('password');
 
   useEffect(() => {
@@ -47,51 +50,31 @@ const RegisterPage = () => {
     fetchImage();
   }, []);
 
-  const onSubmit = async (data) => {
-    if (data.password !== data.confirmPassword) {
-      setBackendMessage('Passwords do not match');
-      return;
+  const onSubmit = handleSubmit(async (data) => { 
+    const response = await signUp(data);
+    console.log('response:', response);
+    if (response.code === 200 || response.code === 201) {
+      setBackendMessage('User created successfully!');
+      setTimeout(() => {
+        navigate('/');
+      }, 2000); 
+    } else {
+      setBackendMessage(`An error occurred: ${response.message || 'Unknown error'}`);
     }
-
-    data.status = true;  // Set status to true by default
-
-    try {
-      const response = await axios.post('http://localhost:3006/api/v1/user/register', data);
-
-      if (response.status === 200 || response.status === 201) {
-        setBackendMessage('User created successfully!');
-        setTimeout(() => {
-          navigate('/'); // Redirect to the homepage after successful registration
-        }, 2000); // Wait for 2 seconds before redirecting
-      }
-    } catch (error) {
-      if (error.response) {
-        if (error.response.status === 404) {
-          setBackendMessage('Endpoint not found. Please check the URL.');
-        } else {
-          setBackendMessage(`An error occurred: ${error.response.data.message || 'Unknown error'}`);
-        }
-      } else if (error.request) {
-        setBackendMessage('No response from server. Please try again later.');
-      } else {
-        setBackendMessage(`An error occurred: ${error.message}`);
-      }
-    }
-  };
+  });
 
   return (
     <Container maxWidth="lg" sx={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>
       <Box sx={{
         display: 'flex',
         width: '98%',
-        height: '70vh', // Adjust height as needed
+        height: '70vh',
         borderRadius: '10px',
         overflow: 'hidden',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
         backgroundColor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
         color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
       }}>
-        {/* Image Box */}
         <Box sx={{
           width: '50%',
           backgroundImage: `url(${backgroundImage})`,
@@ -99,8 +82,6 @@ const RegisterPage = () => {
           backgroundPosition: 'center',
           borderRadius: '10px 0 0 10px',
         }} />
-
-        {/* Form Box */}
         <Box sx={{
           width: '50%',
           display: 'flex',
@@ -114,7 +95,7 @@ const RegisterPage = () => {
           <Typography variant="h4" component="h1" sx={{ mb: 4, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             REGISTER
           </Typography>
-          <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
+          <form onSubmit={onSubmit} style={{ width: '100%' }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
