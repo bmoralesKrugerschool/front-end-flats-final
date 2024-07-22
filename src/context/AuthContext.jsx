@@ -26,49 +26,52 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null); //usuario logueado o null
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-      setUser(JSON.parse(localStorage.getItem('user')));
-    }
-  }, []);
+
   /**
    *  Function to register a new user in the application
    * @param {*} userData 
    */
   const signUp = async (userData) => {
-    console.log('userData:', userData);
-    const res = await register(userData); //res.data
-    console.log('res:', res); //res.data
-    if (res.code !== 201 || !res.data) {
+
+    try {
+
+      const res = await register(userData); //res.data
+      console.log('res:', res); //res.data
+      if (res.code !== 201 || !res.data) {
+        console.log('res:', res);
+        return res;
+      }
       console.log('res:', res);
+      console.log('res:', res.data.user.firstName);
+      console.log('res:', res.data.user);
+
+      let avatarA = getInitialsAvatar(res.data.user.firstName);
+      const userWithAvatar = {
+        ...res.data,
+        avatar: avatarA
+      };
+      console.log('userWithAvatar:', userWithAvatar);
+
+      setUser(userWithAvatar);
+      localStorage.setItem('user', JSON.stringify(userWithAvatar));
+      localStorage.setItem('token', res.data.token);
+      setIsAuthenticated(true);
       return res;
+
+    } catch (error) {
+      console.error('Error signing up:', error);
+      return error.response.data
+
     }
-    console.log('res:', res);
-    console.log('res:', res.data.user.firstName);
-    console.log('res:', res.data.user);
- 
-    let avatarA = getInitialsAvatar(res.data.user.firstName);
-    const userWithAvatar = {
-      ...res.data,
-      avatar: avatarA
-    };
-    console.log('userWithAvatar:', userWithAvatar);
-    
-    setUser(userWithAvatar);
-    localStorage.setItem('user', JSON.stringify(userWithAvatar));
-    localStorage.setItem('token', res.data.token);
-    setIsAuthenticated(true);
-    return res;
+
   };
 
   const signIn = async (credentials) => {
-    console.log('credentials  :', credentials );
+    console.log('credentials  :', credentials);
     const res = await login(credentials);
     console.log('res:', res);
 
-    if (res.code !== 200 || !res.data) { 
+    if (res.code !== 200 || !res.data) {
       return res;
     }
 
@@ -77,7 +80,7 @@ export const AuthProvider = ({ children }) => {
       avatar: getInitialsAvatar(res.data.user.firstName)
     };
     console.log('userWithAvatar:', userWithAvatar);
-    
+
     setUser(userWithAvatar);
     localStorage.setItem('user', JSON.stringify(userWithAvatar));
     localStorage.setItem('token', res.data.token);
@@ -99,12 +102,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
+    <AuthContext.Provider value={{
       isAuthenticated,
-      logout, 
-      user, 
-      signUp, 
-      signIn }}>
+      logout,
+      user,
+      signUp,
+      signIn
+    }}>
       {children}
     </AuthContext.Provider>
   );

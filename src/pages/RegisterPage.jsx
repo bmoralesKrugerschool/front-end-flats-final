@@ -1,22 +1,22 @@
+// src/pages/RegisterPage.js
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Button, TextField, Typography, Container, Grid, IconButton, Box, Alert, Link, MenuItem } from '@mui/material';
+import { Button, TextField, Typography, Container, Grid, IconButton, Box, Link, MenuItem } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { toast, Toaster } from 'sonner';
 
 const RegisterPage = () => {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const [showPassword, setShowPassword] = useState(false);
-  const [backendMessage, setBackendMessage] = useState('');
-  const { themeMode } = useTheme();
   const [backgroundImage, setBackgroundImage] = useState('');
+  const { themeMode } = useTheme();
   const navigate = useNavigate();
-  const { signUp, user } = useAuth();
-
-  console.log('user:', user);
+  const { signUp, isAuthenticated } = useAuth();
   const password = watch('password');
 
   useEffect(() => {
@@ -50,17 +50,22 @@ const RegisterPage = () => {
     fetchImage();
   }, []);
 
-  const onSubmit = handleSubmit(async (data) => { 
-    const response = await signUp(data);
-    console.log('response:', response);
-    if (response.code === 200 || response.code === 201) {
-      setBackendMessage('User created successfully!');
-      setTimeout(() => {
-        navigate('/');
-      }, 2000); 
-    } else {
-      setBackendMessage(`An error occurred: ${response.message || 'Unknown error'}`);
+  useEffect(() => { 
+    if (isAuthenticated) {
+      toast.success('User created successfully!');
+      navigate('/myflats');
     }
+  }, [isAuthenticated, navigate]);
+
+  const onSubmit = handleSubmit(async (data) => {
+    setTimeout(async () => {
+      const response = await signUp(data);
+      if (response.code === 200 || response.code === 201) {
+        toast.success('User created successfully!');
+      } else {
+        toast.error(`An error occurred: ${response.message || 'Unknown error'}`);
+      }
+    }, 2000);
   });
 
   return (
@@ -226,11 +231,6 @@ const RegisterPage = () => {
                 </TextField>
               </Grid>
             </Grid>
-            {backendMessage && (
-              <Alert severity={backendMessage.includes('successfully') ? 'success' : 'error'} sx={{ mt: 2 }}>
-                {backendMessage}
-              </Alert>
-            )}
             <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
               Register
             </Button>
@@ -243,6 +243,7 @@ const RegisterPage = () => {
           </Typography>
         </Box>
       </Box>
+      <Toaster position="top-right" />
     </Container>
   );
 };

@@ -4,6 +4,8 @@ import { FaArrowDown } from 'react-icons/fa';
 import { IoHomeOutline } from 'react-icons/io5';
 import FlatCard from '../components/FlatCard';
 import bannerImage from '../images/FlatTopiaBanner.png';
+import { getFlats } from '../servers/flats';
+
 
 const HomePage = () => {
   const [showArrow, setShowArrow] = useState(true);
@@ -19,15 +21,10 @@ const HomePage = () => {
   };
 
   const fetchRandomFlats = async () => {
-    try {
-      const response = await fetch('http://localhost:3006/api/v1/flats/getFlats?page=1&city=CUENCA&minRentPrice=66&maxRentPrice=888&minAreaSize=88&maxAreaSize=99&limit=12');
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      setFlats(data.flats || []);
-    } catch (error) {
-      console.error('Error fetching random flats:', error.message);
+    const data = await getFlats();
+    console.log('data:', data);
+    if (data.code === 200) {
+      setFlats(data.data.flats || []);
     }
   };
 
