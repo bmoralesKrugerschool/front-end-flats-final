@@ -1,3 +1,5 @@
+// src/pages/HomePage.js
+
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Container, Grid, Button } from '@mui/material';
 import { FaArrowDown } from 'react-icons/fa';
@@ -5,7 +7,6 @@ import { IoHomeOutline } from 'react-icons/io5';
 import FlatCard from '../components/FlatCard';
 import bannerImage from '../images/FlatTopiaBanner.png';
 import { getFlats } from '../servers/flats';
-
 
 const HomePage = () => {
   const [showArrow, setShowArrow] = useState(true);
@@ -24,7 +25,7 @@ const HomePage = () => {
     const data = await getFlats();
     console.log('data:', data);
     if (data.code === 200) {
-      setFlats(data.data.flats || []);
+      setFlats(data.data || []);
     }
   };
 
@@ -125,7 +126,7 @@ const HomePage = () => {
               <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
                 <Box sx={{ position: 'relative' }}>
                   <FlatCard
-                    image={flat.img || 'https://res.cloudinary.com/dv7hsw3kg/image/upload/v1629890099/avatars/avatar-1_ayx1tj.png'}
+                    images={Array.isArray(flat.img) ? flat.img : [flat.img]}
                     title={`${flat.title} for ${flat.city} in ${flat.streetName}`}
                     rentPrice={flat.rentPrice}
                     bedrooms={flat.bedrooms}

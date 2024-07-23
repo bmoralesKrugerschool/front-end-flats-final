@@ -1,10 +1,12 @@
-import React from 'react';
+// src/components/FlatCard.js
+
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardContent, CardMedia, Typography, Box, Tooltip } from '@mui/material';
-import { FaBed, FaBath, FaArrowsAltH } from 'react-icons/fa';
+import { Card, CardContent, CardMedia, Typography, Box, Tooltip, IconButton } from '@mui/material';
+import { FaBed, FaBath, FaArrowsAltH, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 const FlatCard = ({
-  image,
+  images,
   title,
   rentPrice,
   bedrooms,
@@ -16,9 +18,60 @@ const FlatCard = ({
   hasAc,
   petsAllowed
 }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+  };
+
   return (
     <Card sx={{ maxWidth: 345, margin: 2 }}>
-      {image && <CardMedia component="img" height="140" image={image} alt={title} />}
+      {images.length > 0 && (
+        <Box sx={{ position: 'relative' }}>
+          <CardMedia
+            component="img"
+            height="140"
+            image={images[currentImageIndex]}
+            alt={title}
+          />
+          <IconButton
+            onClick={handlePrevImage}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '0',
+              transform: 'translateY(-50%)',
+              color: 'white',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.7)'
+              }
+            }}
+          >
+            <FaArrowLeft />
+          </IconButton>
+          <IconButton
+            onClick={handleNextImage}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              right: '0',
+              transform: 'translateY(-50%)',
+              color: 'white',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.7)'
+              }
+            }}
+          >
+            <FaArrowRight />
+          </IconButton>
+        </Box>
+      )}
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {title}
@@ -61,7 +114,7 @@ const FlatCard = ({
 };
 
 FlatCard.propTypes = {
-  image: PropTypes.string,
+  images: PropTypes.arrayOf(PropTypes.string).isRequired,
   title: PropTypes.string.isRequired,
   rentPrice: PropTypes.number.isRequired,
   bedrooms: PropTypes.number.isRequired,

@@ -67,7 +67,7 @@ const LoginPage = () => {
         localStorage.setItem('user', JSON.stringify(response.data.user));
         setSuccessMessage('Login successful!');
         setOpenSuccessSnackbar(true);
-        setTimeout(() => navigate('/'), 2000); // Redirect after 2 seconds
+        setTimeout(() => navigate('/myflats'), 2000); // Redirect after 2 seconds
       } else {
         setBackendMessage(response.message || 'An error occurred during login. Please try again.');
       }
