@@ -1,22 +1,22 @@
+// src/pages/LoginPage.js
+
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button, Typography, Container, Link, Snackbar } from '@mui/material';
+import { Box, TextField, Button, Typography, Container, Link, Grid, IconButton } from '@mui/material'; // Añadir Grid aquí
 import { useTheme } from '../components/ThemeSwitcher';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../servers/auth';
-import MailIcon from '@mui/icons-material/Mail';
-import LockIcon from '@mui/icons-material/Lock';
+import { useForm } from 'react-hook-form';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { toast, Toaster } from 'sonner';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'; // Importar iconos
 
 const LoginPage = () => {
   const { themeMode } = useTheme();
   const [backgroundImage, setBackgroundImage] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [backendMessage, setBackendMessage] = useState('');
-  const [showAlert, setShowAlert] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar u ocultar contraseña
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
+  const { signIn, isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -49,41 +49,25 @@ const LoginPage = () => {
     fetchImage();
   }, []);
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!email || !password) {
-      setShowAlert(true);
-      return;
+  useEffect(() => { 
+    if (isAuthenticated) {
+      toast.success('User logged in successfully!');
+      navigate('/getFlatsBerear');
     }
+  }, [isAuthenticated, navigate]);
 
-    try {
-      const response = await login({ email, password });
-
+  const onSubmit = handleSubmit(async (data) => {
+    setTimeout(async () => {
+      const response = await signIn(data);
       console.log('response:', response);
+      if (response.code === 200 || response.code === 201) {
 
-      if (response.code === 200 && response.data) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        setSuccessMessage('Login successful!');
-        setOpenSuccessSnackbar(true);
-        setTimeout(() => navigate('/myflats'), 2000); // Redirect after 2 seconds
+        toast.success('User logged in successfully!');
       } else {
-        setBackendMessage(response.message || 'An error occurred during login. Please try again.');
+        toast.error(`An error occurred: ${response.message || 'Unknown error'}`);
       }
-    } catch (error) {
-      console.error('Error signing in:', error);
-      setBackendMessage('An error occurred during login. Please try again.');
-    }
-  };
-
-  const handleCloseAlert = () => {
-    setShowAlert(false);
-  };
-
-  const handleCloseSuccessSnackbar = () => {
-    setOpenSuccessSnackbar(false);
-  };
+    }, 2000);
+  });
 
   return (
     <Container maxWidth="lg" sx={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
@@ -121,53 +105,60 @@ const LoginPage = () => {
             LOGIN
           </Typography>
           <form onSubmit={onSubmit} style={{ width: '100%' }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              InputLabelProps={{
-                style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
-              }}
-              InputProps={{
-                style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' },
-                startAdornment: <MailIcon />
-              }}
-              sx={{ mb: 3 }}
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              InputLabelProps={{
-                style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }
-              }}
-              InputProps={{
-                style: { color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' },
-                startAdornment: <LockIcon />
-              }}
-              sx={{ mb: 3 }}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                bgcolor: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
-                color: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
-                mb: 2
-              }}
-              fullWidth
-            >
-              LOGIN
+            <Grid container spacing={2}>
+              
+              
+              <Grid item xs={12}>
+                <TextField
+                  {...register('email', {
+                    required: 'Email is required',
+                    pattern: {
+                      value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                      message: 'Invalid email address'
+                    }
+                  })}
+                  label="Email"
+                  fullWidth
+                  variant="outlined"
+                  InputProps={{ startAdornment: <FaEnvelope /> }}
+                  error={!!errors.email}
+                  helperText={errors.email && errors.email.message}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  {...register('password', {
+                    required: 'Password is required',
+                    
+                  })}
+                  label="Password"
+                  fullWidth
+                  variant="outlined"
+                  type={showPassword ? 'text' : 'password'}
+                  InputProps={{
+                    startAdornment: <FaLock />,
+                    endAdornment: (
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        onMouseDown={(e) => e.preventDefault()}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </IconButton>
+                    )
+                  }}
+                  error={!!errors.password}
+                  helperText={errors.password && errors.password.message}
+                />
+              </Grid>
+            </Grid>
+            <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
+              Register
             </Button>
           </form>
-          {backendMessage && (
+          {errors.backendMessage && (
             <Typography variant="body2" sx={{ color: 'red', mb: 2 }}>
-              {backendMessage}
+              {errors.backendMessage}
             </Typography>
           )}
           <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
@@ -178,20 +169,7 @@ const LoginPage = () => {
           </Typography>
         </Box>
       </Box>
-      <Snackbar
-        open={showAlert}
-        autoHideDuration={6000}
-        onClose={handleCloseAlert}
-        message="Please fill in both email and password fields."
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      />
-      <Snackbar
-        open={openSuccessSnackbar}
-        autoHideDuration={2000}
-        onClose={handleCloseSuccessSnackbar}
-        message={successMessage}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      />
+      <Toaster position="top-right" />
     </Container>
   );
 };

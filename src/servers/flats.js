@@ -2,6 +2,21 @@ import axios from 'axios';
 
 
 
+
+
+/**
+ * Se extare normal 
+ * @param {*} city 
+ * @param {*} minRentPrice 
+ * @param {*} maxRentPrice 
+ * @param {*} minAreaSize 
+ * @param {*} maxAreaSize 
+ * @param {*} page 
+ * @param {*} limit 
+ * @param {*} sortField 
+ * @param {*} sortOrder 
+ * @returns 
+ */
 export const  getFlats = async (city, minRentPrice, maxRentPrice, minAreaSize, maxAreaSize, page, limit, sortField, sortOrder) => {
   console.log('city:', city);
   console.log('minRentPrice:', minRentPrice);
@@ -37,4 +52,19 @@ export const  getFlats = async (city, minRentPrice, maxRentPrice, minAreaSize, m
   }
 }
 
+
+/**
+ * 
+ * @param {*} id 
+ * @returns 
+ */ 
+export const getFlatsBerear = async () => {
+  const apis = `http://localhost:3006/api/v1/flats/getFlatsBerear`;
+  try {
+    const response = await axios.get(apis);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
 

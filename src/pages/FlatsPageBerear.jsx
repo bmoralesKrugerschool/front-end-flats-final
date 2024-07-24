@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getFlats, getFlatsBerear } from '../servers/flats';
+import { getFlatsBerear } from '../servers/flats';
 
 const FlatsPage = () => {
   const [flats, setFlats] = useState([]);
@@ -20,7 +20,7 @@ const FlatsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getFlats(city, minRentPrice, maxRentPrice, minAreaSize, maxAreaSize, page, limit, sortField, sortOrder);
+      const data = await getFlatsBerear(city, minRentPrice, maxRentPrice, minAreaSize, maxAreaSize, page, limit, sortField, sortOrder);
       if (data.code === 200) {
         setFlats(data.data.flats || []);
       }

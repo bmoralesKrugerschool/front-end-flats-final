@@ -13,13 +13,12 @@ import SendCodePage from './pages/password/SendCodePage';
 import ResetPasswordPage from './pages/password/ResetPasswordPage';
 import NewFlatsPage from './pages/flats/newFlats/NewFlatsPage';
 import HomePage from './pages/HomePage';
-//import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPanel from './pages/AdminPanel';
+import FlatsBerear from './pages/FlatsPageBerear';
 
 const AppContent = () => {
   const location = useLocation();
-
   const isAuthPage = ['/login', '/register', '/send-code', '/reset-password'].includes(location.pathname);
 
   useEffect(() => {
@@ -41,8 +40,8 @@ const AppContent = () => {
         <Route path="/myflats" element={<ProtectedRoute><FlatsPage /></ProtectedRoute>} />
         <Route path="/flats/:id" element={<h1>Flat Details</h1>} />
         <Route path="/flats/:id/edit" element={<h1>Edit Flat</h1>} />
+        <Route path="/getFlatsBerear" element={<FlatsBerear />} />
         <Route path="/flats/new" element={<ProtectedRoute><NewFlatsPage /></ProtectedRoute>} />
-        {/* <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} /> */}
         <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminPanel /></ProtectedRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
