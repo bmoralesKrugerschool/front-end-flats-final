@@ -1,22 +1,27 @@
-// src/pages/LoginPage.js
-
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button, Typography, Container, Link, Grid, IconButton } from '@mui/material'; // Añadir Grid aquí
+import { Box, TextField, Button, Typography, Container, Link, Grid, IconButton, Snackbar } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'; 
+import MuiAlert from '@mui/material/Alert';
 import axios from 'axios';
-import { toast, Toaster } from 'sonner';
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'; // Importar iconos
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const LoginPage = () => {
   const { themeMode } = useTheme();
   const [backgroundImage, setBackgroundImage] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar u ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertSeverity, setAlertSeverity] = useState('info');
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
-  const { signIn, isAuthenticated } = useAuth();
+  const { signIn } = useAuth();
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -30,15 +35,12 @@ const LoginPage = () => {
         setBackgroundImage(response.data.urls.regular);
       } catch (error) {
         console.error('Error fetching image from Unsplash:', error);
-        console.log('Trying alternative API (Pexels)...');
-
         try {
           const alternativeResponse = await axios.get(pexelsUrl, {
             headers: {
               Authorization: `Bearer ${pexelsApiKey}`
             }
           });
-
           setBackgroundImage(alternativeResponse.data.photos[0].src.large);
         } catch (alternativeError) {
           console.error('Error fetching image from Pexels:', alternativeError);
@@ -49,25 +51,23 @@ const LoginPage = () => {
     fetchImage();
   }, []);
 
-  useEffect(() => { 
-    if (isAuthenticated) {
-      toast.success('User logged in successfully!');
-      navigate('/getFlatsBerear');
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
+
+  const onSubmit = async (data) => {
+    const response = await signIn(data);
+    if (response.code === 200 || response.code === 201) {
+      setAlertMessage('User logged in successfully!');
+      setAlertSeverity('success');
+      setOpenAlert(true);
+      setTimeout(() => navigate('/getFlatsBerear'), 2000);
+    } else {
+      setAlertMessage(response.message || 'An error occurred');
+      setAlertSeverity('error');
+      setOpenAlert(true);
     }
-  }, [isAuthenticated, navigate]);
-
-  const onSubmit = handleSubmit(async (data) => {
-    setTimeout(async () => {
-      const response = await signIn(data);
-      console.log('response:', response);
-      if (response.code === 200 || response.code === 201) {
-
-        toast.success('User logged in successfully!');
-      } else {
-        toast.error(`An error occurred: ${response.message || 'Unknown error'}`);
-      }
-    }, 2000);
-  });
+  };
 
   return (
     <Container maxWidth="lg" sx={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
@@ -104,10 +104,8 @@ const LoginPage = () => {
           <Typography variant="h4" component="h1" sx={{ mb: 4, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             LOGIN
           </Typography>
-          <form onSubmit={onSubmit} style={{ width: '100%' }}>
+          <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
             <Grid container spacing={2}>
-              
-              
               <Grid item xs={12}>
                 <TextField
                   {...register('email', {
@@ -129,7 +127,6 @@ const LoginPage = () => {
                 <TextField
                   {...register('password', {
                     required: 'Password is required',
-                    
                   })}
                   label="Password"
                   fullWidth
@@ -153,14 +150,9 @@ const LoginPage = () => {
               </Grid>
             </Grid>
             <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
-              Register
+              Login
             </Button>
           </form>
-          {errors.backendMessage && (
-            <Typography variant="body2" sx={{ color: 'red', mb: 2 }}>
-              {errors.backendMessage}
-            </Typography>
-          )}
           <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             Don't have an account yet? <Link href="/register" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Register!</Link>
           </Typography>
@@ -169,7 +161,17 @@ const LoginPage = () => {
           </Typography>
         </Box>
       </Box>
-      <Toaster position="top-right" />
+      <Snackbar
+        open={openAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{ top: 20 }}
+      >
+        <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

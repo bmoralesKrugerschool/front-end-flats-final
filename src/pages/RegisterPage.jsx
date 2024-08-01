@@ -1,5 +1,3 @@
-// src/pages/RegisterPage.js
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaUser, FaEnvelope, FaLock, FaBirthdayCake, FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -31,15 +29,12 @@ const RegisterPage = () => {
         setBackgroundImage(response.data.urls.regular);
       } catch (error) {
         console.error('Error fetching image from Unsplash:', error);
-        console.log('Trying alternative API (Pexels)...');
-
         try {
           const alternativeResponse = await axios.get(pexelsUrl, {
             headers: {
-              Authorization: pexelsApiKey
+              Authorization: `Bearer ${pexelsApiKey}`
             }
           });
-
           setBackgroundImage(alternativeResponse.data.photos[0].src.large);
         } catch (alternativeError) {
           console.error('Error fetching image from Pexels:', alternativeError);
@@ -50,26 +45,27 @@ const RegisterPage = () => {
     fetchImage();
   }, []);
 
-  useEffect(() => { 
-    if (isAuthenticated) {
-      toast.success('User created successfully!');
-      navigate('/myflats');
-    }
-  }, [isAuthenticated, navigate]);
-
-  const onSubmit = handleSubmit(async (data) => {
-    setTimeout(async () => {
+  const onSubmit = async (data) => {
+    try {
       const response = await signUp(data);
-      if (response.code === 200 || response.code === 201) {
-        toast.success('User created successfully!');
+      if (response.code === 201) {
+        toast.success('User registered successfully!');
+        setTimeout(() => navigate('/login'), 2000);
       } else {
-        toast.error(`An error occurred: ${response.message || 'Unknown error'}`);
+        toast.error(response.message || 'An error occurred');
       }
-    }, 2000);
-  });
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+    }
+  };
+
+  if (isAuthenticated) {
+    navigate('/home');
+    return null;
+  }
 
   return (
-    <Container maxWidth="lg" sx={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+    <Container maxWidth="lg" sx={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6' }}>
       <Box sx={{
         display: 'flex',
         width: '98%',
@@ -77,18 +73,21 @@ const RegisterPage = () => {
         borderRadius: '10px',
         overflow: 'hidden',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        backgroundColor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
+        bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
         color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
       }}>
         <Box sx={{
           width: '50%',
+          height: '100%',
+          borderRadius: '10px 0 0 10px',
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          borderRadius: '10px 0 0 10px',
         }} />
+
         <Box sx={{
           width: '50%',
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -100,28 +99,17 @@ const RegisterPage = () => {
           <Typography variant="h4" component="h1" sx={{ mb: 4, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
             REGISTER
           </Typography>
-          <form onSubmit={onSubmit} style={{ width: '100%' }}>
+          <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
                 <TextField
-                  {...register('firstName', { required: 'First name is required' })}
-                  label="First Name"
+                  {...register('name', { required: 'Name is required' })}
+                  label="Name"
                   fullWidth
                   variant="outlined"
                   InputProps={{ startAdornment: <FaUser /> }}
-                  error={!!errors.firstName}
-                  helperText={errors.firstName && errors.firstName.message}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  {...register('lastName', { required: 'Last name is required' })}
-                  label="Last Name"
-                  fullWidth
-                  variant="outlined"
-                  InputProps={{ startAdornment: <FaUser /> }}
-                  error={!!errors.lastName}
-                  helperText={errors.lastName && errors.lastName.message}
+                  error={!!errors.name}
+                  helperText={errors.name && errors.name.message}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -141,16 +129,9 @@ const RegisterPage = () => {
                   helperText={errors.email && errors.email.message}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
                 <TextField
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 8,
-                      message: 'Password must be at least 8 characters long'
-                    },
-                    validate: value => /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/.test(value) || 'Password must include at least one uppercase letter, one number, and one special character'
-                  })}
+                  {...register('password', { required: 'Password is required' })}
                   label="Password"
                   fullWidth
                   variant="outlined"
@@ -171,75 +152,26 @@ const RegisterPage = () => {
                   helperText={errors.password && errors.password.message}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  {...register('confirmPassword', {
-                    required: 'Please confirm your password',
-                    validate: value => value === password || 'Passwords do not match'
-                  })}
-                  label="Confirm Password"
-                  fullWidth
-                  variant="outlined"
-                  type={showPassword ? 'text' : 'password'}
-                  InputProps={{
-                    startAdornment: <FaLock />,
-                    endAdornment: (
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={() => setShowPassword(!showPassword)}
-                        onMouseDown={(e) => e.preventDefault()}
-                      >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                      </IconButton>
-                    )
-                  }}
-                  error={!!errors.confirmPassword}
-                  helperText={errors.confirmPassword && errors.confirmPassword.message}
-                />
-              </Grid>
               <Grid item xs={12}>
                 <TextField
-                  {...register('birthDate', {
-                    required: 'Birthdate is required',
-                  })}
-                  label="Birthdate"
+                  {...register('birthDate', { required: 'Birth date is required' })}
+                  label="Birth Date"
                   fullWidth
                   variant="outlined"
                   type="date"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
                   InputProps={{ startAdornment: <FaBirthdayCake /> }}
                   error={!!errors.birthDate}
                   helperText={errors.birthDate && errors.birthDate.message}
+                  InputLabelProps={{ shrink: true }}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  {...register('role', { required: 'Role is required' })}
-                  label="Role"
-                  fullWidth
-                  variant="outlined"
-                  select
-                  defaultValue="landlord"
-                  error={!!errors.role}
-                  helperText={errors.role && errors.role.message}
-                >
-                  <MenuItem value="landlord">Landlord</MenuItem>
-                  <MenuItem value="renter">Renter</MenuItem>
-                  <MenuItem value="admin">Admin</MenuItem>
-                </TextField>
               </Grid>
             </Grid>
             <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
               Register
             </Button>
           </form>
-          <Typography variant="body2" sx={{ mt: 2 }}>
-            Already have an account?{' '}
-            <Link href="/login" underline="hover" color="inherit">
-              Log in
-            </Link>
+          <Typography variant="body2" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+            Already have an account? <Link href="/login" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>Login!</Link>
           </Typography>
         </Box>
       </Box>

@@ -1,5 +1,3 @@
-// src/pages/HomePage.js
-
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Container, Grid, Button } from '@mui/material';
 import { FaArrowDown } from 'react-icons/fa';
@@ -22,10 +20,16 @@ const HomePage = () => {
   };
 
   const fetchRandomFlats = async () => {
-    const data = await getFlats();
-    console.log('data:', data);
-    if (data.code === 200) {
-      setFlats(data.data || []);
+    try {
+      const data = await getFlats();  // Utiliza la función getFlats con los parámetros necesarios
+      console.log('data:', data);
+      if (data.code === 200) {
+        setFlats(data.data || []);
+      } else {
+        console.error('Error fetching flats:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching flats:', error);
     }
   };
 
@@ -127,7 +131,7 @@ const HomePage = () => {
                 <Box sx={{ position: 'relative' }}>
                   <FlatCard
                     images={Array.isArray(flat.img) ? flat.img : [flat.img]}
-                    title={`${flat.title} for ${flat.city} in ${flat.streetName}`}
+                    title={flat.title}
                     rentPrice={flat.rentPrice}
                     bedrooms={flat.bedrooms}
                     bathroom={flat.bathroom}

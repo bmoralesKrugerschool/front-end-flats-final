@@ -1,5 +1,3 @@
-// src/components/FlatCard.js
-
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardContent, CardMedia, Typography, Box, Tooltip, IconButton } from '@mui/material';
@@ -79,34 +77,26 @@ const FlatCard = ({
         <Typography variant="h6" color="text.primary" sx={{ mb: 1 }}>
           ${rentPrice}
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <Tooltip title={`Bedrooms: ${bedrooms}`}>
-            <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-              <FaBed style={{ marginRight: '0.5rem' }} /> {bedrooms}
-            </Typography>
-          </Tooltip>
-          <Tooltip title={`Bathrooms: ${bathroom}`}>
-            <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-              <FaBath style={{ marginRight: '0.5rem' }} /> {bathroom}
-            </Typography>
-          </Tooltip>
-          <Tooltip title={`Area: ${areaSize} sq ft`}>
-            <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
-              <FaArrowsAltH style={{ marginRight: '0.5rem' }} /> {areaSize}
-            </Typography>
-          </Tooltip>
-        </Box>
         <Typography variant="body2" color="text.secondary">
-          {streetName}, {streetNumber}
+          <FaBed /> {bedrooms} Bedrooms
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Available: {new Date(dateAvailable).toLocaleDateString()}
+          <FaBath /> {bathroom} Bathrooms
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {hasAc ? 'AC Available' : 'No AC'}
+          <FaArrowsAltH /> {areaSize} sqft
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {petsAllowed ? 'Pets Allowed' : 'No Pets'}
+          {streetNumber} {streetName}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Available from: {new Date(dateAvailable).toLocaleDateString()}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {hasAc ? 'Has AC' : 'No AC'}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {petsAllowed ? 'Pets Allowed' : 'No Pets Allowed'}
         </Typography>
       </CardContent>
     </Card>
@@ -114,7 +104,7 @@ const FlatCard = ({
 };
 
 FlatCard.propTypes = {
-  images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  images: PropTypes.array.isRequired,
   title: PropTypes.string.isRequired,
   rentPrice: PropTypes.number.isRequired,
   bedrooms: PropTypes.number.isRequired,
@@ -124,7 +114,7 @@ FlatCard.propTypes = {
   streetNumber: PropTypes.string.isRequired,
   dateAvailable: PropTypes.string.isRequired,
   hasAc: PropTypes.bool.isRequired,
-  petsAllowed: PropTypes.bool.isRequired,
+  petsAllowed: PropTypes.bool.isRequired
 };
 
 export default FlatCard;
