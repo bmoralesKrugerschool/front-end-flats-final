@@ -22,7 +22,6 @@ const HomePage = () => {
   const fetchRandomFlats = async () => {
     try {
       const data = await getFlats();  // Utiliza la función getFlats con los parámetros necesarios
-      console.log('data:', data);
       if (data.code === 200) {
         setFlats(data.data || []);
       } else {
@@ -35,11 +34,7 @@ const HomePage = () => {
 
   const checkAuthStatus = () => {
     const token = localStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
+    setIsLoggedIn(!!token);
   };
 
   useEffect(() => {
@@ -65,7 +60,15 @@ const HomePage = () => {
 
   return (
     <Container maxWidth={false} disableGutters>
-      <Box sx={{ width: '100%', height: { xs: '50vh', md: '100vh' }, position: 'relative', overflow: 'hidden' }}>
+      <Box
+        sx={{
+          width: '100%',
+          height: { xs: '50vh', md: '100vh' },
+          position: 'relative',
+          overflow: 'hidden',
+          mt: { xs: '64px', sm: '64px', md: '0' }, // Adjust for Navbar height
+        }}
+      >
         <Box
           component="img"
           src={bannerImage}
@@ -117,9 +120,31 @@ const HomePage = () => {
           </Box>
         )}
       </Box>
-      <Container sx={{ mt: 4, mb: 2, px: { xs: 2, sm: 3, md: 4 } }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, flexDirection: { xs: 'column', sm: 'row' }, textAlign: { xs: 'center', sm: 'left' } }}>
-          <IoHomeOutline style={{ fontSize: '2rem', marginRight: { xs: 0, sm: '0.5rem' }, marginBottom: { xs: '0.5rem', sm: 0 } }} />
+      <Container
+        sx={{
+          mt: 4,
+          mb: 2,
+          px: { xs: 2, sm: 3, md: 4 },
+          position: 'relative',
+          zIndex: 1, // Ensure content is above background
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            mb: 2,
+            flexDirection: { xs: 'column', sm: 'row' },
+            textAlign: { xs: 'center', sm: 'left' },
+          }}
+        >
+          <IoHomeOutline
+            style={{
+              fontSize: '2rem',
+              marginRight: { xs: 0, sm: '0.5rem' },
+              marginBottom: { xs: '0.5rem', sm: 0 },
+            }}
+          />
           <Typography variant="h4" component="h2">
             Suggested Flats
           </Typography>

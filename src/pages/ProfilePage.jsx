@@ -3,20 +3,23 @@ import { useAuth } from '../context/AuthContext';
 import { Container, Box, Typography, TextField, Button, Avatar, Link, Grid, MenuItem, Select, InputLabel } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
 import VerificationCodeModal from '../components/VerificationCodeModal';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
     const { themeMode } = useTheme();
-    const { user, signUp } = useAuth();
+    const { user, updateProfile } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
         lastName: '',
         email: '',
-        password: '',
         birthDate: '',
         role: '',
+        avatar: ''
     });
     const [isEditing, setIsEditing] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (user) {
@@ -24,9 +27,9 @@ const ProfilePage = () => {
                 name: user.name || '',
                 lastName: user.lastName || '',
                 email: user.email || '',
-                password: '', // No deberías mostrar la contraseña en el perfil
                 birthDate: user.birthDate || '',
                 role: user.role || '',
+                avatar: user.avatar || ''
             });
         }
     }, [user]);
@@ -37,31 +40,34 @@ const ProfilePage = () => {
             const file = files[0];
             const reader = new FileReader();
             reader.onloadend = () => {
-                setFormData({ ...formData, avatar: reader.result });
+                setFormData(prevState => ({ ...prevState, avatar: reader.result }));
             };
             reader.readAsDataURL(file);
         } else {
-            setFormData({ ...formData, [name]: value });
+            setFormData(prevState => ({ ...prevState, [name]: value }));
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Validación simple
-        if (!formData.name || !formData.lastName || !formData.email || !formData.password || !formData.birthDate || !formData.role) {
-            alert('Please fill out all required fields.');
+        const validationErrors = validateFormData(formData);
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
             return;
         }
         try {
-            await signUp(formData);
+            await updateProfile(formData);
             setIsEditing(false);
+            setErrors({});
         } catch (error) {
             console.error('Failed to update profile:', error);
+            // Manejo de errores adicionales si es necesario
         }
     };
 
     const handleOpenModal = () => setOpenModal(true);
     const handleCloseModal = () => setOpenModal(false);
+    const handleChangePassword = () => navigate('/send-code'); // Redirige a SendCodePage
 
     return (
         <Container maxWidth="sm" sx={{ 
@@ -94,6 +100,8 @@ const ProfilePage = () => {
                                 onChange={handleChange}
                                 sx={{ mb: 3 }}
                                 disabled={!isEditing}
+                                error={!!errors.name}
+                                helperText={errors.name}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -106,6 +114,8 @@ const ProfilePage = () => {
                                 onChange={handleChange}
                                 sx={{ mb: 3 }}
                                 disabled={!isEditing}
+                                error={!!errors.lastName}
+                                helperText={errors.lastName}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -119,20 +129,14 @@ const ProfilePage = () => {
                                 onChange={handleChange}
                                 sx={{ mb: 3 }}
                                 disabled={!isEditing}
+                                error={!!errors.email}
+                                helperText={errors.email}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                variant="outlined"
-                                label="Password"
-                                name="password"
-                                type="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                sx={{ mb: 3 }}
-                                disabled={!isEditing}
-                            />
+                            <Button onClick={handleChangePassword} variant="outlined" color="primary" sx={{ mb: 3 }} disabled={!isEditing}>
+                                Change Password
+                            </Button>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -146,6 +150,8 @@ const ProfilePage = () => {
                                 sx={{ mb: 3 }}
                                 InputLabelProps={{ shrink: true }}
                                 disabled={!isEditing}
+                                error={!!errors.birthDate}
+                                helperText={errors.birthDate}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>

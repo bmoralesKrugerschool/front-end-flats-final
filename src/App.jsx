@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+// src/App.js
+import React from 'react';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -21,7 +22,7 @@ const AppContent = () => {
   const location = useLocation();
   const isAuthPage = ['/login', '/register', '/send-code', '/reset-password'].includes(location.pathname);
 
-  useEffect(() => {
+  React.useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
