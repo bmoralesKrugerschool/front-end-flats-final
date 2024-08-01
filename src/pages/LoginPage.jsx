@@ -61,7 +61,7 @@ const LoginPage = () => {
       setAlertMessage('User logged in successfully!');
       setAlertSeverity('success');
       setOpenAlert(true);
-      setTimeout(() => navigate('/getFlatsBerear'), 2000);
+      setTimeout(() => navigate('/'), 2000);
     } else {
       setAlertMessage(response.message || 'An error occurred');
       setAlertSeverity('error');

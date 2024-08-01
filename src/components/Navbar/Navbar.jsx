@@ -35,6 +35,8 @@ import { AuthContext } from '../../context/AuthContext';
 import Logo from '../../images/logo.svg';
 import DefaultUserPicture from '../../images/DefaultUserPicture.svg';
 
+const drawerWidth = 240;
+
 const Navbar = ({ notifications }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [youOpen, setYouOpen] = useState(true);
@@ -147,10 +149,10 @@ const Navbar = ({ notifications }) => {
         variant="permanent"
         open={drawerOpen}
         sx={{
-          width: drawerOpen ? 240 : 60,
+          width: drawerOpen ? drawerWidth : 60,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: drawerOpen ? 240 : 60,
+            width: drawerOpen ? drawerWidth : 60,
             boxSizing: 'border-box',
             bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6',
             color: themeMode === 'dark' ? '#FAF0E6' : '#352F44',
@@ -196,16 +198,10 @@ const Navbar = ({ notifications }) => {
             </>
           )}
           <List sx={{ mb: 2 }}>
-            <ListItem button component={Link} to="/about" sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-              <ListItemIcon><InfoIcon /></ListItemIcon>
-              {drawerOpen && <ListItemText primary="About" />}
+            <ListItem button onClick={() => { logout(); navigate('/'); }} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
+              <ListItemIcon><LogoutIcon /></ListItemIcon>
+              {drawerOpen && <ListItemText primary="Logout" />}
             </ListItem>
-            {isAuthenticated && (
-              <ListItem button onClick={() => { logout(); navigate('/'); }} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                <ListItemIcon><LogoutIcon /></ListItemIcon>
-                {drawerOpen && <ListItemText primary="Log Out" />}
-              </ListItem>
-            )}
           </List>
         </Box>
       </Drawer>
