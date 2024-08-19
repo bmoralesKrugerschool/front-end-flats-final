@@ -197,12 +197,14 @@ const Navbar = ({ notifications }) => {
               <Divider />
             </>
           )}
-          <List sx={{ mb: 2 }}>
-            <ListItem button onClick={() => { logout(); navigate('/'); }} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-              <ListItemIcon><LogoutIcon /></ListItemIcon>
-              {drawerOpen && <ListItemText primary="Logout" />}
-            </ListItem>
-          </List>
+          {isAuthenticated && (
+            <List sx={{ mb: 2 }}>
+              <ListItem button onClick={() => { logout(); navigate('/'); }} sx={{ color: themeMode === 'dark' ? '#FAF0E6' : '#352F44', display: drawerOpen ? 'flex' : 'none' }}>
+                <ListItemIcon><LogoutIcon /></ListItemIcon>
+                <ListItemText primary="Logout" />
+              </ListItem>
+            </List>
+          )}
         </Box>
       </Drawer>
     </>

@@ -36,7 +36,7 @@ const AppContent = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/send-code" element={<SendCodePage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/myflats" element={<ProtectedRoute><FlatsPage /></ProtectedRoute>} />
         <Route path="/flats/:id" element={<h1>Flat Details</h1>} />

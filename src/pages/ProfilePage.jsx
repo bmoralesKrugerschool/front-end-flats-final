@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Container, Box, Typography, TextField, Button, Avatar, Link, Grid, MenuItem, Select, InputLabel } from '@mui/material';
+import { Container, Box, Typography, TextField, Button, Avatar, Grid, MenuItem, Select, InputLabel } from '@mui/material';
 import { useTheme } from '../components/ThemeSwitcher';
-import VerificationCodeModal from '../components/VerificationCodeModal';
+import LoginModal from '../components/LoginModal';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
@@ -17,22 +18,39 @@ const ProfilePage = () => {
         avatar: ''
     });
     const [isEditing, setIsEditing] = useState(false);
-    const [openModal, setOpenModal] = useState(false);
+    const [openLoginModal, setOpenLoginModal] = useState(false);
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (user) {
-            setFormData({
-                name: user.name || '',
-                lastName: user.lastName || '',
-                email: user.email || '',
-                birthDate: user.birthDate || '',
-                role: user.role || '',
-                avatar: user.avatar || ''
-            });
-        }
-    }, [user]);
+        const fetchUserData = async () => {
+            if (user && user.id) {
+                try {
+                    console.log('Fetching user data for ID:', user.id);
+                    const response = await axios.get(`http://localhost:3006/api/v1/user/${userId}`)
+                    console.log('User data fetched:', response.data);
+                    const userData = response.data;
+                    setFormData({
+                        name: userData.name || '',
+                        lastName: userData.lastName || '',
+                        email: userData.email || '',
+                        birthDate: userData.birthDate || '',
+                        role: userData.role || '',
+                        avatar: userData.avatar || ''
+                    });
+                } catch (error) {
+                    console.error('Failed to fetch user data:', error.response ? error.response.data : error.message);
+                    setOpenLoginModal(true);
+                }
+            } else {
+                console.log('User ID is missing or invalid');
+                setOpenLoginModal(true);
+            }
+            setLoading(false);
+        };
+        fetchUserData();
+    }, [user]);    
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -56,18 +74,37 @@ const ProfilePage = () => {
             return;
         }
         try {
-            await updateProfile(formData);
+            await axios.put(`http://localhost:3006/api/v1/user/${user.id}`, formData);
             setIsEditing(false);
             setErrors({});
         } catch (error) {
-            console.error('Failed to update profile:', error);
-            // Manejo de errores adicionales si es necesario
+            console.error('Failed to update profile:', error.response ? error.response.data : error.message);
         }
     };
 
-    const handleOpenModal = () => setOpenModal(true);
-    const handleCloseModal = () => setOpenModal(false);
-    const handleChangePassword = () => navigate('/send-code'); // Redirige a SendCodePage
+    const validateFormData = (data) => {
+        const errors = {};
+        if (!data.name) errors.name = 'First name is required';
+        if (!data.lastName) errors.lastName = 'Last name is required';
+        if (!data.email) errors.email = 'Email is required';
+        if (!data.birthDate) errors.birthDate = 'Birth date is required';
+        if (!data.role) errors.role = 'Role is required';
+        return errors;
+    };
+
+    const handleLoginSuccess = () => {
+        setOpenLoginModal(false);
+        // Trigger a refresh of user data if needed
+        window.location.reload();
+    };
+
+    if (loading) {
+        return (
+            <Container maxWidth="sm" sx={{ bgcolor: themeMode === 'dark' ? '#352F44' : '#FAF0E6', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+                <Typography variant="h6">Loading...</Typography>
+            </Container>
+        );
+    }
 
     return (
         <Container maxWidth="sm" sx={{ 
@@ -134,7 +171,7 @@ const ProfilePage = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Button onClick={handleChangePassword} variant="outlined" color="primary" sx={{ mb: 3 }} disabled={!isEditing}>
+                            <Button onClick={() => navigate('/send-code')} variant="outlined" color="primary" sx={{ mb: 3 }} disabled={!isEditing}>
                                 Change Password
                             </Button>
                         </Grid>
@@ -158,39 +195,39 @@ const ProfilePage = () => {
                             <InputLabel>Role</InputLabel>
                             <Select
                                 fullWidth
-                                variant="outlined"
                                 name="role"
                                 value={formData.role}
                                 onChange={handleChange}
-                                sx={{ mb: 3 }}
                                 disabled={!isEditing}
+                                sx={{ mb: 3 }}
+                                error={!!errors.role}
+                                helperText={errors.role}
                             >
                                 <MenuItem value="admin">Admin</MenuItem>
                                 <MenuItem value="landlord">Landlord</MenuItem>
                                 <MenuItem value="renter">Renter</MenuItem>
                             </Select>
                         </Grid>
+                        <Grid item xs={12}>
+                            {isEditing ? (
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <Button type="submit" variant="contained" color="primary">
+                                        Save
+                                    </Button>
+                                    <Button onClick={() => setIsEditing(false)} variant="outlined" color="secondary">
+                                        Cancel
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <Button onClick={() => setIsEditing(true)} variant="contained" color="primary">
+                                    Edit
+                                </Button>
+                            )}
+                        </Grid>
                     </Grid>
-                    {isEditing ? (
-                        <Button type="submit" variant="contained" color="primary" sx={{ mb: 3 }}>
-                            Save Changes
-                        </Button>
-                    ) : (
-                        <Button onClick={() => setIsEditing(true)} variant="contained" color="secondary" sx={{ mb: 3 }}>
-                            Edit Profile
-                        </Button>
-                    )}
                 </form>
-                {user?.role === 'admin' && (
-                    <Link href="/admin" variant="body2" sx={{ display: 'block', mb: 3, color: themeMode === 'dark' ? '#FAF0E6' : '#352F44' }}>
-                        Go to Admin Panel
-                    </Link>
-                )}
-                <Button onClick={handleOpenModal} variant="outlined" color="error">
-                    Delete Account
-                </Button>
+                <LoginModal open={openLoginModal} onClose={() => setOpenLoginModal(false)} onLoginSuccess={handleLoginSuccess} />
             </Box>
-            <VerificationCodeModal open={openModal} onClose={handleCloseModal} />
         </Container>
     );
 };
